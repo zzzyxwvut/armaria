@@ -19,6 +19,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<junit.version>4.12</junit.version>
+		<logger.version>2.9.0</logger.version>
 	</properties>
 
 	<dependencies>
@@ -30,4 +31,8 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+	
+	<modules>
+		<module>armaria-logging</module>
+	</modules>
 </project>
