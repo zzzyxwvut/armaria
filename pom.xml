@@ -28,6 +28,8 @@
 		<mysql.version>6.0.6</mysql.version>
 		<dozer.version>5.5.1</dozer.version>
 		<servlet.version>3.1.0</servlet.version>
+		<jsp.version>2.3.1</jsp.version>
+		<jstl.version>1.2</jstl.version>
 	</properties>
 
 	<dependencies>
@@ -48,5 +50,6 @@
 		<module>armaria-dao</module>
 		<module>armaria-service</module>
 		<module>armaria-security</module>
+		<module>armaria-web</module>
 	</modules>
 </project>
