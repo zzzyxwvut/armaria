@@ -24,8 +24,10 @@
 		<hibernate.version>5.2.12.Final</hibernate.version>
 		<spring.version>4.3.10.RELEASE</spring.version>
 		<spring.data.version>1.11.6.RELEASE</spring.data.version>
+		<spring.security.version>4.2.3.RELEASE</spring.security.version>
 		<mysql.version>6.0.6</mysql.version>
 		<dozer.version>5.5.1</dozer.version>
+		<servlet.version>3.1.0</servlet.version>
 	</properties>
 
 	<dependencies>
@@ -45,5 +47,6 @@
 		<module>armaria-domain</module>
 		<module>armaria-dao</module>
 		<module>armaria-service</module>
+		<module>armaria-security</module>
 	</modules>
 </project>
