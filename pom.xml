@@ -20,6 +20,7 @@
 
 		<junit.version>4.12</junit.version>
 		<logger.version>2.9.0</logger.version>
+		<flyway.version>4.2.0</flyway.version>
 	</properties>
 
 	<dependencies>
@@ -34,5 +35,6 @@
 	
 	<modules>
 		<module>armaria-logging</module>
+		<module>armaria-migration</module>
 	</modules>
 </project>
