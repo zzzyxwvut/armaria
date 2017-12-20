@@ -32,9 +32,10 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-	
+
 	<modules>
 		<module>armaria-logging</module>
 		<module>armaria-migration</module>
+		<module>armaria-utils</module>
 	</modules>
 </project>
