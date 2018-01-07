@@ -51,5 +51,6 @@
 		<module>armaria-service</module>
 		<module>armaria-security</module>
 		<module>armaria-web</module>
+		<module>armaria-tomcat-beans</module>
 	</modules>
 </project>
