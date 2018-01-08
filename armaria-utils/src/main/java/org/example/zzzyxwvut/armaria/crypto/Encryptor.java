@@ -52,12 +52,12 @@ public enum Encryptor
 			throw new RuntimeException(e);
 		}
 
-		String storeType	= bean.getStoreType();
-		String keyAlgorithm	= bean.getKeyAlgorithm();
-		String storeName	= bean.getStoreName();
-		String storeWord	= bean.getStoreWord();
-		String aliasName	= bean.getAliasName();
-		String aliasWord	= bean.getAliasWord();
+		String storeType	= Objects.requireNonNull(bean.getStoreType());
+		String keyAlgorithm	= Objects.requireNonNull(bean.getKeyAlgorithm());
+		String storeName	= Objects.requireNonNull(bean.getStoreName());
+		String storeWord	= Objects.requireNonNull(bean.getStoreWord());
+		String aliasName	= Objects.requireNonNull(bean.getAliasName());
+		String aliasWord	= Objects.requireNonNull(bean.getAliasWord());
 		Cipher cipher		= null;
 		SecretKey secret	= null;
 
@@ -65,10 +65,10 @@ public enum Encryptor
 				new File(System.getProperty("user.home"),
 								storeName))) {
 			KeyStore store	= KeyStore.getInstance(storeType);
+			store.load(input, storeWord.toCharArray());
 			PasswordProtection wordProtection =
 						new KeyStore.PasswordProtection(
 							aliasWord.toCharArray());
-			store.load(input, storeWord.toCharArray());
 			Entry entry	= store.getEntry(aliasName, wordProtection);
 			SecretKey sk	= ((KeyStore.SecretKeyEntry) entry).getSecretKey();
 
@@ -89,10 +89,14 @@ public enum Encryptor
 	 *
 	 * @param word	a word to encrypt
 	 * @return	the encrypted word stored in the Base64 encoding scheme
+	 * @throws	NullPointerException if {@code word} is {@code null}
 	 * @throws	RuntimeException if encrypting fails
 	 */
 	public String encrypt(String word)
 	{
+		if (word == null)
+			throw new NullPointerException();
+
 		byte[] value	= null;
 
 		try {
@@ -110,10 +114,14 @@ public enum Encryptor
 	 *
 	 * @param word	an encrypted word stored in the Base64 encoding scheme
 	 * @return	the decrypted word
+	 * @throws	NullPointerException if {@code word} is {@code null}
 	 * @throws	RuntimeException if decrypting fails
 	 */
 	public String decrypt(String word)
 	{
+		if (word == null)
+			throw new NullPointerException();
+
 		byte[] value	= null;
 
 		try {
@@ -132,6 +140,7 @@ public enum Encryptor
 	 * @param aa	a value to compare to
 	 * @param bb	a value to compare to
 	 * @return	true if the arguments are equal to each other and false otherwise
+	 * @throws	NullPointerException if either {@code aa} or {@code bb} is {@code null}
 	 */
 	public boolean equals(byte[] aa, byte[] bb)
 	{
@@ -156,6 +165,7 @@ public enum Encryptor
 	 * @param aa	a value to compare to
 	 * @param bb	a value to compare to
 	 * @return	true if the arguments are equal to each other and false otherwise
+	 * @throws	NullPointerException if either {@code aa} or {@code bb} is {@code null}
 	 */
 	public boolean equals(String aa, String bb)
 	{
