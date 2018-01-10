@@ -8,6 +8,7 @@ import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStore.Entry;
 import java.security.KeyStore.PasswordProtection;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Objects;
 
@@ -137,24 +138,23 @@ public enum Encryptor
 	/**
 	 * Tests whether the arguments are equal to each other.
 	 *
-	 * @param aa	a value to compare to
-	 * @param bb	a value to compare to
+	 * @param tenable	a tenable value to compare to
+	 * @param pending	a pending value to compare to
 	 * @return	true if the arguments are equal to each other and false otherwise
-	 * @throws	NullPointerException if either {@code aa} or {@code bb} is {@code null}
+	 * @throws	NullPointerException if either {@code tenable} or {@code pending} is {@code null}
 	 */
-	public boolean equals(byte[] aa, byte[] bb)
+	public boolean equals(byte[] tenable, byte[] pending)
 	{
-		if (aa == null || bb == null)
+		if (tenable == null || pending == null)
 			throw new NullPointerException();
 
-		if (aa.length != bb.length)
-			return false;
-
-		int test	= 0;
+		/* Out-procrustes Procrustes. */
+		byte[] uniform	= Arrays.copyOf(tenable, pending.length);
+		int test	= uniform.length ^ tenable.length;
 
 		/* Ay, observe time-constant iteration, no fail-fast! */
-		for (int i = 0, j = aa.length; i < j; ++i)
-			test	|= aa[i] ^ bb[i];
+		for (int i = 0, j = pending.length; i < j; ++i)
+			test	|= uniform[i] ^ pending[i];
 
 		return (test == 0);
 	}
@@ -162,17 +162,17 @@ public enum Encryptor
 	/**
 	 * Tests whether the arguments are equal to each other.
 	 *
-	 * @param aa	a value to compare to
-	 * @param bb	a value to compare to
+	 * @param tenable	a tenable value to compare to
+	 * @param pending	a pending value to compare to
 	 * @return	true if the arguments are equal to each other and false otherwise
-	 * @throws	NullPointerException if either {@code aa} or {@code bb} is {@code null}
+	 * @throws	NullPointerException if either {@code tenable} or {@code pending} is {@code null}
 	 */
-	public boolean equals(String aa, String bb)
+	public boolean equals(String tenable, String pending)
 	{
-		if (aa == null || bb == null)
+		if (tenable == null || pending == null)
 			throw new NullPointerException();
 
-		return Encryptor.INSTANCE.equals(aa.getBytes(StandardCharsets.UTF_8),
-					bb.getBytes(StandardCharsets.UTF_8));
+		return Encryptor.INSTANCE.equals(tenable.getBytes(StandardCharsets.UTF_8),
+					pending.getBytes(StandardCharsets.UTF_8));
 	}
 }
