@@ -2,6 +2,7 @@ package org.example.zzzyxwvut.armaria.migration;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.sql.DataSource;
@@ -9,7 +10,11 @@ import javax.sql.DataSource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.flywaydb.core.Flyway;
+import org.flywaydb.core.api.FlywayException;
 
+/**
+ * This class employs the Flyway tool to migrate data to a database.
+ */
 public class Migrator extends HttpServlet
 {
 	private static final long serialVersionUID	= 2777568529926894959L;
@@ -38,9 +43,9 @@ public class Migrator extends HttpServlet
 	public void init() throws ServletException
 	{
 		try {
-			Context context	= new InitialContext();
-			DataSource s	= (DataSource)
-					context.lookup("java:/comp/env/jdbc/poachers");
+			Context initContext	= new InitialContext();
+			Context envContext	= (Context) initContext.lookup("java:comp/env");
+			DataSource s	= (DataSource) envContext.lookup("jdbc/poachers");
 			Flyway flyway	= new Flyway();
 			flyway.setDataSource(s);
 			flyway.baseline();
@@ -53,7 +58,7 @@ public class Migrator extends HttpServlet
 			} else {
 				logger.debug("Database is up to date.");
 			}
-		} catch (Exception e) {
+		} catch (NamingException | FlywayException e) {
 			logger.error(Migrator.class.getCanonicalName(), e);
 		}
 	}
