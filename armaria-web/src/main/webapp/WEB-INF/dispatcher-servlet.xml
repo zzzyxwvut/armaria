@@ -13,6 +13,7 @@ http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
 	<mvc:annotation-driven />
 
+	<context:component-scan base-package="org.example.zzzyxwvut.armaria.handlers" />
 	<context:component-scan base-package="org.example.zzzyxwvut.armaria.controllers" />
 
 	<bean class="org.example.zzzyxwvut.armaria.debug.DebuggingBeanPostProcessor" />
