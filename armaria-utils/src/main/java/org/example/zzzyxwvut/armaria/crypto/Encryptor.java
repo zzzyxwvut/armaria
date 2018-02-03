@@ -102,7 +102,8 @@ public enum Encryptor
 
 		try {
 			cipher.init(Cipher.ENCRYPT_MODE, secret);
-			value	= cipher.doFinal(word.getBytes(StandardCharsets.UTF_8));
+			value	= cipher.doFinal(
+					word.getBytes(StandardCharsets.UTF_8));
 		} catch (GeneralSecurityException e) {
 			throw new RuntimeException(e);
 		}
@@ -127,7 +128,8 @@ public enum Encryptor
 
 		try {
 			cipher.init(Cipher.DECRYPT_MODE, secret);
-			value	= cipher.doFinal(Base64.getDecoder().decode(word));
+			value	= cipher.doFinal(
+					Base64.getDecoder().decode(word));
 		} catch (GeneralSecurityException e) {
 			throw new RuntimeException(e);
 		}
@@ -141,7 +143,8 @@ public enum Encryptor
 	 * @param tenable	a tenable value to compare to
 	 * @param pending	a pending value to compare to
 	 * @return	true if the arguments are equal to each other and false otherwise
-	 * @throws	NullPointerException if either {@code tenable} or {@code pending} is {@code null}
+	 * @throws	NullPointerException if either {@code tenable} or {@code pending}
+	 *			is {@code null}
 	 */
 	public boolean equals(byte[] tenable, byte[] pending)
 	{
@@ -165,7 +168,8 @@ public enum Encryptor
 	 * @param tenable	a tenable value to compare to
 	 * @param pending	a pending value to compare to
 	 * @return	true if the arguments are equal to each other and false otherwise
-	 * @throws	NullPointerException if either {@code tenable} or {@code pending} is {@code null}
+	 * @throws	NullPointerException if either {@code tenable} or {@code pending}
+	 *			is {@code null}
 	 */
 	public boolean equals(String tenable, String pending)
 	{
