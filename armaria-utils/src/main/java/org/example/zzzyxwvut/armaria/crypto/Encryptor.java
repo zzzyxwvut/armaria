@@ -8,7 +8,6 @@ import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStore.Entry;
 import java.security.KeyStore.PasswordProtection;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.Objects;
 
@@ -151,13 +150,11 @@ public enum Encryptor
 		if (tenable == null || pending == null)
 			throw new NullPointerException();
 
-		/* Out-procrustes Procrustes. */
-		byte[] uniform	= Arrays.copyOf(tenable, pending.length);
-		int test	= uniform.length ^ tenable.length;
+		int test	= tenable.length ^ pending.length;
 
 		/* Ay, observe time-constant iteration, no fail-fast! */
-		for (int i = 0, j = pending.length; i < j; ++i)
-			test	|= uniform[i] ^ pending[i];
+		for (int i = 0, t = tenable.length, p = pending.length; i < p; ++i)
+			test	|= tenable[i % t] ^ pending[i];
 
 		return (test == 0);
 	}
