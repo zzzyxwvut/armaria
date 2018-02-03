@@ -2,7 +2,6 @@ package org.example.zzzyxwvut.armaria.migration;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.sql.DataSource;
@@ -10,7 +9,6 @@ import javax.sql.DataSource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.flywaydb.core.Flyway;
-import org.flywaydb.core.api.FlywayException;
 
 /**
  * This class employs the Flyway tool to migrate data to a database.
@@ -58,8 +56,8 @@ public class Migrator extends HttpServlet
 			} else {
 				logger.debug("Database is up to date.");
 			}
-		} catch (NamingException | FlywayException e) {
-			logger.error(Migrator.class.getCanonicalName(), e);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 		}
 	}
 }
