@@ -1,4 +1,4 @@
-package org.example.zzzyxwvut.armaria.migration;
+package org.example.zzzyxwvut.armaria.servlets;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
