@@ -8,6 +8,7 @@ import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStore.Entry;
 import java.security.KeyStore.PasswordProtection;
+import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.Objects;
 
@@ -37,6 +38,7 @@ public enum Encryptor
 
 	private final Cipher cipher;
 	private final SecretKey secret;
+	private final SecureRandom random;
 	private final Logger logger	= LogManager.getLogger();
 
 	private Encryptor()
@@ -80,8 +82,52 @@ public enum Encryptor
 		} finally {
 			this.secret	= Objects.requireNonNull(secret);
 			this.cipher	= Objects.requireNonNull(cipher);
+			this.random	= new SecureRandom();
 			logger.debug("Encryptor is initialised");
 		}
+	}
+
+	/* Sprinkles a word with a poor man's salt. */
+	private byte[] sprinkle(byte[] word)
+	{
+		assert word != null;
+
+		byte[] uniform	= new byte[word.length << 1];
+		random.nextBytes(uniform);
+
+		for (int i = 1, j = 0, k = 0, w = word.length; k < w;
+							i += 2, j += 2, ++k)
+			uniform[i]	= (byte) (uniform[j] ^ word[k]);
+
+		/*
+		 * (random)[0]			XOR(word[0], (random)[0]) == uniform[1]
+		 * uniform[1] <- word[0]
+		 *
+		 * (random)[2]
+		 * uniform[3] <- word[1]
+		 */
+		return uniform;
+	}
+
+	/* Winnows a poor man's salt from a word. */
+	private byte[] winnow(byte[] word)
+	{
+		assert word != null;
+
+		byte[] uniform	= new byte[word.length >> 1];
+
+		for (int i = 0, j = 0, k = 1, u = uniform.length; i < u;
+							++i, j += 2, k += 2)
+			uniform[i]	= (byte) (word[j] ^ word[k]);
+
+		/*
+		 *		 word[0]	XOR(word[0], word[1]) == uniform[0]
+		 * uniform[0] <- word[1]	   (random)
+		 *
+		 *		 word[2]
+		 * uniform[1] <- word[3]
+		 */
+		return uniform;
 	}
 
 	/**
@@ -107,7 +153,7 @@ public enum Encryptor
 			throw new RuntimeException(e);
 		}
 
-		return Base64.getEncoder().encodeToString(value);
+		return Base64.getEncoder().encodeToString(sprinkle(value));
 	}
 
 	/**
@@ -127,8 +173,8 @@ public enum Encryptor
 
 		try {
 			cipher.init(Cipher.DECRYPT_MODE, secret);
-			value	= cipher.doFinal(
-					Base64.getDecoder().decode(word));
+			value	= cipher.doFinal(winnow(
+					Base64.getDecoder().decode(word)));
 		} catch (GeneralSecurityException e) {
 			throw new RuntimeException(e);
 		}
