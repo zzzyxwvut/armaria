@@ -58,7 +58,7 @@
 	</session-config>
 
 	<error-page>
-		<location>/index</location>
+		<location>/error</location>
 	</error-page>
 
 	<resource-ref>
