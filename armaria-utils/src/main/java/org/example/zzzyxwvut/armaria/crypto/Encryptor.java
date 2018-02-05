@@ -135,8 +135,8 @@ public enum Encryptor
 	 *
 	 * @param word	a word to encrypt
 	 * @return	the encrypted word stored in the Base64 encoding scheme
-	 * @throws	NullPointerException if {@code word} is {@code null}
-	 * @throws	RuntimeException if encrypting fails
+	 * @throws NullPointerException if {@code word} is {@code null}
+	 * @throws RuntimeException if encrypting fails
 	 */
 	public String encrypt(String word)
 	{
@@ -161,8 +161,8 @@ public enum Encryptor
 	 *
 	 * @param word	an encrypted word stored in the Base64 encoding scheme
 	 * @return	the decrypted word
-	 * @throws	NullPointerException if {@code word} is {@code null}
-	 * @throws	RuntimeException if decrypting fails
+	 * @throws NullPointerException if {@code word} is {@code null}
+	 * @throws RuntimeException if decrypting fails
 	 */
 	public String decrypt(String word)
 	{
@@ -188,7 +188,7 @@ public enum Encryptor
 	 * @param tenable	a tenable value to compare to
 	 * @param pending	a pending value to compare to
 	 * @return	true if the arguments are equal to each other and false otherwise
-	 * @throws	NullPointerException if either {@code tenable} or {@code pending}
+	 * @throws NullPointerException if either {@code tenable} or {@code pending}
 	 *			is {@code null}
 	 */
 	public boolean equals(byte[] tenable, byte[] pending)
@@ -211,7 +211,7 @@ public enum Encryptor
 	 * @param tenable	a tenable value to compare to
 	 * @param pending	a pending value to compare to
 	 * @return	true if the arguments are equal to each other and false otherwise
-	 * @throws	NullPointerException if either {@code tenable} or {@code pending}
+	 * @throws NullPointerException if either {@code tenable} or {@code pending}
 	 *			is {@code null}
 	 */
 	public boolean equals(String tenable, String pending)
