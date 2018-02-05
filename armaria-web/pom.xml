@@ -25,6 +25,13 @@
 
 		<dependency>
 			<groupId>${project.groupId}</groupId>
+			<artifactId>armaria-tomcat-beans</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>armaria-migration</artifactId>
 			<version>${project.version}</version>
 		</dependency>

@@ -41,13 +41,20 @@
 	</servlet>
 
 	<servlet>
-		<servlet-name>dispatcher</servlet-name>
+		<servlet-name>librarian</servlet-name>
 		<servlet-class>
-			org.springframework.web.servlet.DispatcherServlet
+			org.example.zzzyxwvut.armaria.servlets.Librarian
 		</servlet-class>
 		<load-on-startup>2</load-on-startup>
 	</servlet>
 
+	<servlet>
+		<servlet-name>dispatcher</servlet-name>
+		<servlet-class>
+			org.springframework.web.servlet.DispatcherServlet
+		</servlet-class>
+		<load-on-startup>3</load-on-startup>
+	</servlet>
 	<servlet-mapping>
 		<servlet-name>dispatcher</servlet-name>
 		<url-pattern>/</url-pattern>
@@ -61,6 +68,7 @@
 		<error-code>404</error-code>
 		<location>/invalid</location>
 	</error-page>
+
 	<error-page>
 		<location>/error</location>
 	</error-page>
@@ -77,6 +85,7 @@
 			org.example.zzzyxwvut.tomcat.resources.StoreBean
 		</resource-env-ref-type>
 	</resource-env-ref>
+
 	<resource-env-ref>
 		<resource-env-ref-name>bean/LibrarianBeanFactory</resource-env-ref-name>
 		<resource-env-ref-type>
