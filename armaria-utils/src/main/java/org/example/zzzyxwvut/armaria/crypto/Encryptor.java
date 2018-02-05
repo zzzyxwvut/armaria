@@ -197,10 +197,13 @@ public enum Encryptor
 			throw new NullPointerException();
 
 		int test	= tenable.length ^ pending.length;
+		byte[] uniform	= (tenable.length < 1)
+							? new byte[] { 0 }
+							: tenable;
 
 		/* Ay, observe time-constant iteration, no fail-fast! */
-		for (int i = 0, t = tenable.length, p = pending.length; i < p; ++i)
-			test	|= tenable[i % t] ^ pending[i];
+		for (int i = 0, t = uniform.length, p = pending.length; i < p; ++i)
+			test	|= uniform[i % t] ^ pending[i];
 
 		return (test == 0);
 	}
