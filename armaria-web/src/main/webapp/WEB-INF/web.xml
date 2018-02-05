@@ -73,6 +73,14 @@
 
 	<resource-env-ref>
 		<resource-env-ref-name>bean/StoreBeanFactory</resource-env-ref-name>
-		<resource-env-ref-type>org.example.zzzyxwvut.tomcat.resources.StoreBean</resource-env-ref-type>
+		<resource-env-ref-type>
+			org.example.zzzyxwvut.tomcat.resources.StoreBean
+		</resource-env-ref-type>
+	</resource-env-ref>
+	<resource-env-ref>
+		<resource-env-ref-name>bean/LibrarianBeanFactory</resource-env-ref-name>
+		<resource-env-ref-type>
+			org.example.zzzyxwvut.tomcat.resources.LibrarianBean
+		</resource-env-ref-type>
 	</resource-env-ref>
 </web-app>
