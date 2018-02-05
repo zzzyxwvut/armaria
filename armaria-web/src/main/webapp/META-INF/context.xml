@@ -19,6 +19,8 @@
 <!-- The contents of this file will be loaded for each web application -->
 
 <Context>
+	<Resources override="true" allowLinking="true" />
+
 	<ResourceLink name="jdbc/poachers"
 		global="jdbc/poachers"
 		type="javax.sql.DataSource" />
@@ -26,4 +28,8 @@
 	<ResourceLink name="bean/StoreBeanFactory"
 		global="bean/StoreBeanFactory"
 		type="org.example.zzzyxwvut.tomcat.resources.StoreBean" />
+
+	<ResourceLink name="bean/LibrarianBeanFactory"
+		global="bean/LibrarianBeanFactory"
+		type="org.example.zzzyxwvut.tomcat.resources.LibrarianBean" />
 </Context>
