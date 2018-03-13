@@ -22,6 +22,7 @@
 		<logger.version>2.9.0</logger.version>
 		<flyway.version>4.2.0</flyway.version>
 		<hibernate.version>5.2.12.Final</hibernate.version>
+		<validator.version>6.0.2.Final</validator.version>
 		<spring.version>4.3.10.RELEASE</spring.version>
 		<spring.data.version>1.11.6.RELEASE</spring.data.version>
 		<spring.security.version>4.2.3.RELEASE</spring.security.version>
