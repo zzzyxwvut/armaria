@@ -45,5 +45,12 @@
 			<artifactId>dozer-spring</artifactId>
 			<version>${dozer.version}</version>
 		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/io.craftsman/dozer-jdk8-support -->
+		<dependency>
+			<groupId>io.craftsman</groupId>
+			<artifactId>dozer-jdk8-support</artifactId>
+			<version>${dozer.jdk8.version}</version>
+		</dependency>
 	</dependencies>
 </project>
