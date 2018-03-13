@@ -35,7 +35,7 @@
 	<servlet>
 		<servlet-name>migrator</servlet-name>
 		<servlet-class>
-			org.example.zzzyxwvut.armaria.servlets.Migrator
+			org.example.zzzyxwvut.armaria.servlets.MigratorServlet
 		</servlet-class>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
@@ -43,7 +43,7 @@
 	<servlet>
 		<servlet-name>librarian</servlet-name>
 		<servlet-class>
-			org.example.zzzyxwvut.armaria.servlets.Librarian
+			org.example.zzzyxwvut.armaria.servlets.LibrarianServlet
 		</servlet-class>
 		<load-on-startup>2</load-on-startup>
 	</servlet>

@@ -21,7 +21,7 @@ import org.example.zzzyxwvut.tomcat.resources.LibrarianBean;
 /**
  * This class provides a means to reference a path on the file system.
  */
-public class Librarian extends HttpServlet
+public class LibrarianServlet extends HttpServlet
 {
 	private static final long serialVersionUID	= -2893488840321237557L;
 	private final Logger logger	= LogManager.getLogger();

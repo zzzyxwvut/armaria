@@ -13,12 +13,12 @@ import org.flywaydb.core.Flyway;
 /**
  * This class employs the Flyway tool to migrate data to a database.
  */
-public class Migrator extends HttpServlet
+public class MigratorServlet extends HttpServlet
 {
 	private static final long serialVersionUID	= 2777568529926894959L;
 	private final Logger logger	= LogManager.getLogger();
 
-	public Migrator() { }
+	public MigratorServlet() { }
 
 	/*
 	 * From https://flywaydb.org/documentation/migrations
