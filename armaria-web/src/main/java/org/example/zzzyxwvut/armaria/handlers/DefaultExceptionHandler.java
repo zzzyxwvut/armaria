@@ -26,16 +26,19 @@ public class DefaultExceptionHandler
 	 * @throws Exception	if this exception object is marked with the
 	 *				{@code @ResponseStatus} annotation
 	 */
-	@ExceptionHandler(value = Exception.class)
-	private ModelAndView handle(HttpServletRequest request,
+	@ExceptionHandler(Exception.class)
+	public ModelAndView handle(HttpServletRequest request,
 			HttpServletResponse response, Exception e) throws Exception
 	{
 		if (AnnotationUtils.findAnnotation(e.getClass(),
-					ResponseStatus.class) != null)
+						ResponseStatus.class) != null)
 			throw e;
 
-		return	DefaultExceptionModelAndView.populate(request,
-				HttpStatus.valueOf(response.getStatus()),
-				new ModelAndView("error"), e);
+		HttpStatus status	= HttpStatus.valueOf(response.getStatus());
+		status	= (status.is4xxClientError() || status.is5xxServerError())
+					? status
+					: HttpStatus.INTERNAL_SERVER_ERROR;
+		return DefaultExceptionModelAndView.populate(request,
+					status, new ModelAndView("error"), e);
 	}
 }
