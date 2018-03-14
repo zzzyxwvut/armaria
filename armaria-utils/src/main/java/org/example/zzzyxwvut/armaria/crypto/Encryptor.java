@@ -26,8 +26,8 @@ import org.example.zzzyxwvut.tomcat.resources.StoreBean;
 /**
  * This enum provides the functionality to encrypt and decrypt strings.
  * Its initialisation depends on the availability of a keystore with
- * a valid secret key alias-entry and the {@link StoreBean} attributes
- * to fetch this key.
+ * valid secret key alias-entries and the {@link StoreBean} attributes
+ * to fetch the keys.
  *
  * @see StoreBean
  */
@@ -37,7 +37,8 @@ public enum Encryptor
 	INSTANCE;
 
 	private final Cipher cipher;
-	private final SecretKey secret;
+	private final SecretKey secret_0;
+	private final SecretKey secret_1;
 	private final SecureRandom random;
 	private final Logger logger	= LogManager.getLogger();
 
@@ -60,27 +61,37 @@ public enum Encryptor
 		String storeWord	= Objects.requireNonNull(bean.getStoreWord());
 		String aliasName	= Objects.requireNonNull(bean.getAliasName());
 		String aliasWord	= Objects.requireNonNull(bean.getAliasWord());
+		String extraName	= Objects.requireNonNull(bean.getExtraName());
+		String extraWord	= Objects.requireNonNull(bean.getExtraWord());
 		Cipher cipher		= null;
-		SecretKey secret	= null;
+		SecretKey secret_0	= null;
+		SecretKey secret_1	= null;
 
 		try	(FileInputStream input	= new FileInputStream(
 				new File(System.getProperty("user.home"),
 								storeName))) {
 			KeyStore store	= KeyStore.getInstance(storeType);
 			store.load(input, storeWord.toCharArray());
-			PasswordProtection wordProtection =
-						new KeyStore.PasswordProtection(
-							aliasWord.toCharArray());
-			Entry entry	= store.getEntry(aliasName, wordProtection);
-			SecretKey sk	= ((KeyStore.SecretKeyEntry) entry).getSecretKey();
 
-			secret	= new SecretKeySpec(sk.getEncoded(), keyAlgorithm);
+			PasswordProtection wp_0	= new KeyStore.PasswordProtection(
+							aliasWord.toCharArray());
+			Entry entry_0	= store.getEntry(aliasName, wp_0);
+			SecretKey sk_0	= ((KeyStore.SecretKeyEntry) entry_0).getSecretKey();
+			secret_0	= new SecretKeySpec(sk_0.getEncoded(), keyAlgorithm);
+
+			PasswordProtection wp_1	= new KeyStore.PasswordProtection(
+							extraWord.toCharArray());
+			Entry entry_1	= store.getEntry(extraName, wp_1);
+			SecretKey sk_1	= ((KeyStore.SecretKeyEntry) entry_1).getSecretKey();
+			secret_1	= new SecretKeySpec(sk_1.getEncoded(), keyAlgorithm);
+
 			cipher	= Cipher.getInstance(keyAlgorithm);
 		} catch (IOException | GeneralSecurityException e) {
 			logger.error(e.getMessage(), e);
 			throw new RuntimeException(e);
 		} finally {
-			this.secret	= Objects.requireNonNull(secret);
+			this.secret_0	= Objects.requireNonNull(secret_0);
+			this.secret_1	= Objects.requireNonNull(secret_1);
 			this.cipher	= Objects.requireNonNull(cipher);
 			this.random	= new SecureRandom();
 			logger.debug("Encryptor is initialised");
@@ -130,6 +141,40 @@ public enum Encryptor
 		return uniform;
 	}
 
+	private String encrypt0(String word, SecretKey secret)
+	{
+		assert word != null && secret != null;
+
+		byte[] value	= null;
+
+		try {
+			cipher.init(Cipher.ENCRYPT_MODE, secret);
+			value	= cipher.doFinal(
+					word.getBytes(StandardCharsets.UTF_8));
+		} catch (GeneralSecurityException e) {
+			throw new RuntimeException(e);
+		}
+
+		return Base64.getEncoder().encodeToString(sprinkle(value));
+	}
+
+	private String decrypt0(String word, SecretKey secret)
+	{
+		assert word != null && secret != null;
+
+		byte[] value	= null;
+
+		try {
+			cipher.init(Cipher.DECRYPT_MODE, secret);
+			value	= cipher.doFinal(winnow(
+					Base64.getDecoder().decode(word)));
+		} catch (GeneralSecurityException e) {
+			throw new RuntimeException(e);
+		}
+
+		return new String(value, StandardCharsets.UTF_8);
+	}
+
 	/**
 	 * Encrypts a word.
 	 *
@@ -143,17 +188,20 @@ public enum Encryptor
 		if (word == null)
 			throw new NullPointerException();
 
-		byte[] value	= null;
+		return encrypt0(word, secret_0);
+	}
 
-		try {
-			cipher.init(Cipher.ENCRYPT_MODE, secret);
-			value	= cipher.doFinal(
-					word.getBytes(StandardCharsets.UTF_8));
-		} catch (GeneralSecurityException e) {
-			throw new RuntimeException(e);
-		}
+	/**
+	 * Encrypts a word, using an alternative secret key.
+	 *
+	 * @see #encrypt(String)
+	 */
+	public String encryptAlternative(String word)
+	{
+		if (word == null)
+			throw new NullPointerException();
 
-		return Base64.getEncoder().encodeToString(sprinkle(value));
+		return encrypt0(word, secret_1);
 	}
 
 	/**
@@ -169,17 +217,21 @@ public enum Encryptor
 		if (word == null)
 			throw new NullPointerException();
 
-		byte[] value	= null;
+		return decrypt0(word, secret_0);
+	}
 
-		try {
-			cipher.init(Cipher.DECRYPT_MODE, secret);
-			value	= cipher.doFinal(winnow(
-					Base64.getDecoder().decode(word)));
-		} catch (GeneralSecurityException e) {
-			throw new RuntimeException(e);
-		}
+	/**
+	 * Decrypts an encrypted word stored in the Base64 encoding scheme,
+	 * using an alternative secret key.
+	 *
+	 * @see #decrypt(String)
+	 */
+	public String decryptAlternative(String word)
+	{
+		if (word == null)
+			throw new NullPointerException();
 
-		return new String(value, StandardCharsets.UTF_8);
+		return decrypt0(word, secret_1);
 	}
 
 	/**
@@ -211,11 +263,7 @@ public enum Encryptor
 	/**
 	 * Tests whether the arguments are equal to each other.
 	 *
-	 * @param tenable	a tenable value to compare to
-	 * @param pending	a pending value to compare to
-	 * @return	true if the arguments are equal to each other and false otherwise
-	 * @throws NullPointerException if either {@code tenable} or {@code pending}
-	 *			is {@code null}
+	 * @see #equals(byte[], byte[])
 	 */
 	public boolean equals(String tenable, String pending)
 	{
