@@ -20,14 +20,18 @@ package org.example.zzzyxwvut.tomcat.resources;
  *		assumed to be relative to the user.home system property
  *	storeWord -- the keystore password
  *	aliasName -- the alias name of an entry
- *	aliasWord -- the alias name password</pre>
+ *	aliasWord -- the alias name password
+ *	extraName -- the alias name of an extra entry (e.g. rotational)
+ *	extraWord -- the alias name password</pre>
  *
- * For example, with the keytool JDK utility we generate a 128-bit AES
- * secret "april" key valid for 30 days:
+ * For example, with the keytool JDK utility we generate two 128-bit AES
+ * secret keys, "march" and "april":
  * <pre>
  *	$ cd ~
+ *	$ keytool -genseckey -v -alias march -keyalg AES -keysize 128 \
+ *				-storetype jceks -keystore keys.jks
  *	$ keytool -genseckey -v -alias april -keyalg AES -keysize 128 \
- *		-storetype jceks -keystore keys.jks -validity 30</pre>
+ *				-storetype jceks -keystore keys.jks</pre>
  *
  * And later we would fill in the &lt;Resource&gt; element of the
  * server.xml configuration file as follows:
@@ -36,9 +40,11 @@ package org.example.zzzyxwvut.tomcat.resources;
  *		&lt;!-- Any omitted entries... --&gt;
  *
  *		&lt;Resource
- *			aliasName="april"
+ *			aliasName="march"
  *			aliasWord="&lt;the-alias-name-password&gt;"
  *			auth="Container"
+ *			extraName="april"
+ *			extraWord="&lt;the-alias-name-password&gt;"
  *			factory="org.apache.naming.factory.BeanFactory"
  *			keyAlgorithm="AES"
  *			name="bean/StoreBeanFactory"
@@ -62,6 +68,8 @@ public final class StoreBean
 	private transient String storeWord;
 	private transient String aliasName;
 	private transient String aliasWord;
+	private transient String extraName;
+	private transient String extraWord;
 
 	public StoreBean() { }
 
@@ -113,4 +121,20 @@ public final class StoreBean
 	 */
 	public String getAliasWord()	{ return aliasWord; }
 	public void setAliasWord(String aliasWord)	{ this.aliasWord	= aliasWord; }
+
+	/**
+	 * Gets the alias name of an extra entry (e.g. rotational).
+	 *
+	 * @return	the alias name of an extra entry
+	 */
+	public String getExtraName()	{ return extraName; }
+	public void setExtraName(String extraName)	{ this.extraName	= extraName; }
+
+	/**
+	 * Gets the alias name password.
+	 *
+	 * @return	the alias name password
+	 */
+	public String getExtraWord()	{ return extraWord; }
+	public void setExtraWord(String extraWord)	{ this.extraWord	= extraWord; }
 }
