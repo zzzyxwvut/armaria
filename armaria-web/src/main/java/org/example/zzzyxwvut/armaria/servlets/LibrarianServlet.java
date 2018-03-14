@@ -23,7 +23,7 @@ import org.example.zzzyxwvut.tomcat.resources.LibrarianBean;
  */
 public class LibrarianServlet extends HttpServlet
 {
-	private static final long serialVersionUID	= -2893488840321237557L;
+	private static final long serialVersionUID	= 7388168433767303392L;
 	private final Logger logger	= LogManager.getLogger();
 
 	@Override
@@ -95,6 +95,12 @@ public class LibrarianServlet extends HttpServlet
 					&& name.toLowerCase().endsWith(fileSuffix);
 			}
 		});
+
+		if (list == null || list.length == 0) {
+			logger.error(LibrarianServlet.class.getName() + ": No files found");
+			return;
+		}
+
 		boolean passed	= true;
 
 		/*
