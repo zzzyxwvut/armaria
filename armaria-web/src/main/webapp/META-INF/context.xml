@@ -16,7 +16,6 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<!-- The contents of this file will be loaded for each web application -->
 
 <Context>
 	<Resources override="true" allowLinking="true" />
@@ -32,4 +31,12 @@
 	<ResourceLink name="bean/LibrarianBeanFactory"
 		global="bean/LibrarianBeanFactory"
 		type="org.example.zzzyxwvut.tomcat.resources.LibrarianBean" />
+
+	<ResourceLink name="bean/MailReaderBeanFactory"
+		global="bean/MailReaderBeanFactory"
+		type="org.example.zzzyxwvut.tomcat.resources.MailReaderBean" />
+
+	<ResourceLink name="bean/MailWriterBeanFactory"
+		global="bean/MailWriterBeanFactory"
+		type="org.example.zzzyxwvut.tomcat.resources.MailWriterBean" />
 </Context>
