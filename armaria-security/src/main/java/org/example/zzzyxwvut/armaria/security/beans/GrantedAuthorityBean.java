@@ -8,7 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
 
 public final class GrantedAuthorityBean implements GrantedAuthority, Serializable
 {
-	private static final long serialVersionUID = -4692721104933914925L;
+	private static final long serialVersionUID	= -4692721104933914925L;
 
 	/**
 	 * @serial	an authority that is granted to the principal
