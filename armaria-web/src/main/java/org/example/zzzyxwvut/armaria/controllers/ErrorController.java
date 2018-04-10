@@ -3,6 +3,7 @@ package org.example.zzzyxwvut.armaria.controllers;
 import javax.servlet.http.HttpServletRequest;
 
 import org.example.zzzyxwvut.armaria.handlers.DefaultExceptionModelAndView;
+import org.example.zzzyxwvut.armaria.security.UserCredentialsException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -22,6 +23,15 @@ public class ErrorController
 	{
 		return DefaultExceptionModelAndView.populate(request,
 			HttpStatus.INTERNAL_SERVER_ERROR, new ModelAndView("error"), e);
+	}
+
+	@ResponseStatus(HttpStatus.UNAUTHORIZED)
+	@GetMapping("/reject")
+	public ModelAndView reject(HttpServletRequest request,
+						UserCredentialsException e)
+	{
+		return DefaultExceptionModelAndView.populate(request,
+			HttpStatus.UNAUTHORIZED, new ModelAndView("reject"), e);
 	}
 
 	@ResponseStatus(HttpStatus.NOT_FOUND)
