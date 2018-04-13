@@ -1,0 +1,191 @@
+@font-face {
+	font-family:	'Princeps Senatus';
+	src:	url('fonts/Augustus.eot');
+	src:	url('fonts/Augustus.eot?#iefix') format('embedded-opentype'),
+		url('fonts/Augustus.woff')	format('woff'),
+		url('fonts/Augustus.woff2')	format('woff2'),
+		url('fonts/Augustus.ttf')	format('truetype'),
+		url('fonts/Augustus.svg#Augustus') format('svg'),
+		local('☺︎');
+	font-weight:	500;
+	font-style:	normal;
+}
+
+body {
+	background:	url('images/cover-2.svg') center fixed no-repeat;
+	background-size: cover;		/* css3 prop. */
+}
+
+#pagination ul {
+	background-color: #bebebe;
+
+	/* (t&r&b&l), (t&b, l&r), (t, l&r, b), (t, r, b, l) */
+	margin:		0 0 2% 0;
+	/* (t&r&b&l), (t&b, l&r), (t, l&r, b), (t, r, b, l) */
+	padding:	0;
+
+	list-style-type: none;
+	list-style-image: none;
+}
+
+#pagination li {
+	display:	inline-block;
+	padding:	1ex 2ex 1ex 2ex;
+	position:	relative;
+}
+
+#pagination li a {
+	color:		#0000ff;	/* blue */
+	text-decoration: none;		/* toss the link underline */
+}
+
+#pagination li:hover a {
+	color:		#ffff00 !important;	/* yellow */
+}
+
+#pagination #active a {
+	color:		#ff0000;	/* red */
+}
+
+#pagination #active:hover a {
+	color:		#000000 !important;
+}
+
+#pagination #disabled a {
+	color:		#d4d4d4;
+}
+
+#pagination #bale {
+	margin:		0 0 2% 0;
+	position:	absolute;
+	right:		1%;
+}
+
+th {
+	overflow:	hidden;
+	text-overflow:	ellipsis;
+	white-space:	nowrap;
+}
+
+th, td {
+	padding: 10px;
+	text-align:	left;
+	letter-spacing:	0.2px;
+}
+
+td a, th a {
+	display:	block;
+	width:		100%;
+	text-decoration: none;		/* toss the link underline */
+}
+
+td a:visited, th a:visited {
+	color:		#0000ff;	/* blue */
+}
+
+a:hover {
+	color:		#ffff00 !important;	/* yellow */
+}
+
+#bale a, #profile a {
+	text-decoration: none;		/* toss the link underline */
+}
+
+#bale a:hover, #profile a:hover {
+	color:		#ff0000 !important;	/* red */
+	background-color: transparent;
+}
+
+table {
+	table-layout:	fixed;
+	width:		100%;
+	border-collapse: collapse;
+	border:		2px outset #bebebe;
+	margin:		0;
+	padding:	0;
+	overflow:	scroll;
+	font-family:	'Princeps Senatus';
+	font-size:	medium;
+}
+
+thead th:nth-child(1) {
+	width:	3%;
+}
+
+thead th:nth-child(2) {
+	width:	15%;
+}
+
+thead th:nth-child(3) {
+	width:	20%;
+}
+
+thead th:nth-child(4) {
+	width:	20%;
+}
+
+thead th:nth-child(5) {
+	width:	8%;
+}
+
+thead th:nth-child(6) {
+	width:	6%;
+}
+
+thead th:nth-child(7) {
+	width:	8%;
+}
+
+thead th:nth-child(8) {
+	width:	10%;
+}
+
+thead th:nth-child(9) {
+	width:	10%;
+}
+
+tr:nth-child(odd) {
+	background-color: transparent;
+	text-shadow:	1px 0.5px 1px #ffffff;
+}
+
+tr:nth-child(even), thead {
+	background:	linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.3));
+}
+
+caption {
+	padding:	20px;
+	caption-side:	top;
+	color:		#000000;
+	text-align:	center;
+	letter-spacing:	8px;
+}
+
+.no-js #smart {				/* Hide a js-aware link */
+	display:	none;
+}
+
+.js #smart {
+	display:	block;
+}
+
+.no-js #dumb {
+	overflow:	visible;
+	width:		auto;
+	margin:		0;
+	padding:	0;
+	background:	none;
+	border:		none;
+	cursor:		pointer;
+	font-family:	'Princeps Senatus';
+	font-size:	medium;
+}
+
+.no-js #dumb span {
+	color:		#0000ff;	/* blue */
+	text-decoration: none;		/* toss the link underline */
+}
+
+div.invalid, span.invalid {
+	color:		#ff0000;	/* red */
+}
