@@ -1,0 +1,46 @@
+@font-face {
+	font-family:	'Princeps Senatus';
+	src:	url('fonts/Augustus.eot');
+	src:	url('fonts/Augustus.eot?#iefix') format('embedded-opentype'),
+		url('fonts/Augustus.woff')	format('woff'),
+		url('fonts/Augustus.woff2')	format('woff2'),
+		url('fonts/Augustus.ttf')	format('truetype'),
+		url('fonts/Augustus.svg#Augustus') format('svg'),
+		local('☺︎');
+	font-weight:	500;
+	font-style:	normal;
+}
+
+body {
+	background:	url('images/cover-2.svg') center fixed no-repeat;
+	background-size: cover;		/* css3 prop. */
+}
+
+pre {
+	font-family:	'Princeps Senatus';
+	font-size:	x-large;
+}
+
+#encrypt {
+	font:		bold large monospace;
+	border:		0.2ex outset #ffffff;
+	box-sizing:	border-box;
+	width:		30%;
+}
+
+#update {
+	font:		bold large monospace;
+	display:	inline-block;
+	background-color: transparent;
+	text-align:	center;
+	min-width:	4ex;
+	box-shadow:	0ex 0.5ex 0.5ex 0ex rgba(0, 0, 0, 0.2);
+	z-index:	1;		/* css3 prop. */
+	color:		#000000;	/* black */
+	padding:	0.5ex 0.5ex;
+	text-decoration: none;
+}
+
+div.invalid, span.invalid {
+	color:		#ff0000;	/* red */
+}
