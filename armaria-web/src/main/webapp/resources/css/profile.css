@@ -1,0 +1,48 @@
+@font-face {
+	font-family:	'Princeps Senatus';
+	src:	url('fonts/Augustus.eot');
+	src:	url('fonts/Augustus.eot?#iefix') format('embedded-opentype'),
+		url('fonts/Augustus.woff')	format('woff'),
+		url('fonts/Augustus.woff2')	format('woff2'),
+		url('fonts/Augustus.ttf')	format('truetype'),
+		url('fonts/Augustus.svg#Augustus') format('svg'),
+		local('☺︎');
+	font-weight:	500;
+	font-style:	normal;
+}
+
+body {
+	background:	url('images/cover-2.svg') center fixed no-repeat;
+	background-size: cover;		/* css3 prop. */
+}
+
+#menu, #policy, pre {
+	font-family:	'Princeps Senatus';
+	font-size:	x-large;
+}
+
+#menu ul {
+	/* (t&r&b&l), (t&b, l&r), (t, l&r, b), (t, r, b, l) */
+	margin:		0 0 5% 0;
+	/* (t&r&b&l), (t&b, l&r), (t, l&r, b), (t, r, b, l) */
+	padding:	0;
+
+	list-style-type: none;
+	list-style-image: none;
+}
+
+#menu li {
+	display:	inline-block;
+	padding:	1ex 2ex 1ex 2ex;
+	position:	relative;
+	color:		#00ffff;	/* cyan */
+}
+
+#menu li a, #logout a {
+	text-decoration: none;		/* toss the link underline */
+}
+
+#menu li a:hover, #logout a:hover {
+	color:		#ff0000 !important;	/* red */
+	background-color: transparent;
+}
