@@ -1,0 +1,163 @@
+@font-face {
+	font-family:	'Princeps Senatus';
+	src:	url('fonts/Augustus.eot');
+	src:	url('fonts/Augustus.eot?#iefix') format('embedded-opentype'),
+		url('fonts/Augustus.woff')	format('woff'),
+		url('fonts/Augustus.woff2')	format('woff2'),
+		url('fonts/Augustus.ttf')	format('truetype'),
+		url('fonts/Augustus.svg#Augustus') format('svg'),
+		local('☺︎');
+	font-weight:	500;
+	font-style:	normal;
+}
+
+body {
+	background:	rgba(250, 0, 0, 0.4) url('images/20130711_105350-0.jpg') center fixed no-repeat;
+	background-size: cover;		/* css3 prop. */
+}
+
+ul {
+	background-color: transparent;
+	font:		bold large monospace;
+	float:		right;
+
+	/* (t&r&b&l), (t&b, l&r), (t, l&r, b), (t, r, b, l) */
+	margin:		0 2% 2% 0;
+	/* (t&r&b&l), (t&b, l&r), (t, l&r, b), (t, r, b, l) */
+	padding:	0;
+
+	list-style-type: none;
+	list-style-image: none;
+}
+
+li {
+	display:	inline-block;
+	padding:	1ex 4ex 4ex 4ex;
+	position:	relative;
+	text-decoration: none;
+	color:		#00ffff;	/* cyan */
+}
+
+li:hover {
+	color:		#ff0000 !important;	/* red */
+	background-color: transparent;
+}
+
+li form {
+	display:	block;
+	position:	absolute;
+	background-color: transparent;
+	text-align:	center;
+	min-width:	4ex;
+	box-shadow:	0ex 0.5ex 0.5ex 0ex rgba(0, 0, 0, 0.2);
+	z-index:	1;		/* css3 prop. */
+	transition:	transform 0ms linear 0ms;
+	transform:	scale(1, 0);
+	transform-origin: top center;
+	color:		#000000;	/* black */
+	padding:	0.5ex 0.5ex;
+	text-decoration: none;
+}
+
+li:hover form {
+	display:	block;
+	color:		#ff0000 !important;	/* red */
+	background-color: transparent;
+	transition:	transform 200ms ease-out 80ms;
+	transform:	scale(1, 1);
+}
+
+#signin {
+	left:		25%;
+	top:		50%;
+}
+
+#signup {
+	right:		25%;
+	top:		50%;
+}
+
+#menu #help:hover {
+	color:		#ffff00 !important;
+}
+
+#menu #signin:hover, #menu #signup:hover, #tongue #translate:hover {
+	background-color: rgba(250, 0, 0, 0.4);
+	transform:	scale3d(1.2, 1.2, 1.2) rotate3d(0, 1, 0, 45deg);
+}
+
+/* :active should be declared after :hover, see CSS 2.1 Spec., 5.11.4 */
+#menu #signin:active, #menu #signup:active, #tongue #translate:active {
+	background-color: #ffff00;	/* yellow */
+}
+
+pre {
+	font-family:	'Princeps Senatus';
+	font-size:	x-large;
+}
+
+#salute pre {
+	position:	absolute;
+	color:		#ffff00;
+	top:		35%;
+	right:		0;
+	background:	transparent;
+	display:	inline-block;
+	border:		0.2ex outset;
+
+	padding:	1ex 2ex 1ex 2ex;
+	position:	absolute;
+	text-decoration: none;
+
+	transition:	color 4s ease-out 10ms,
+			opacity 8s ease-in 8s;
+	opacity:	0;		/* css3 prop. */
+	/* (horiz &vert &blur) */
+	text-shadow:	0px -2px 2px #ffffff;
+}
+
+#footer {
+	font-family:	'Princeps Senatus';
+	font-size:	x-large;
+	position:	absolute;
+	color:		#ff0000;
+	margin:		0 2% 0 0;
+	bottom:		0;
+	right:		0;
+}
+
+input[type=submit] {
+	background-color: #d3d3d3;
+	border:		0.2ex outset transparent;
+}
+
+input[type=submit]:hover {
+	background-color: #ffff00;	/* yellow */
+	border:		0.2ex inset #ffff00;
+}
+
+a {
+	text-decoration: none;		/* toss the link underline */
+}
+
+a:hover {
+	color:		#ffff00 !important;	/* yellow */
+}
+
+#tongue {
+	/* (t&r&b&l), (t&b, l&r), (t, l&r, b), (t, r, b, l) */
+	margin:		0 0 0 1%;
+	float:		left;
+
+	border:		0.2ex outset #ffffff;
+	color:		#ff0000;	/* red */
+	background:	transparent url('images/tongue-0.png') center no-repeat;
+	background-size: cover;		/* css3 prop. */
+	width:		4.4ex;		/* button's height */
+	height:		4.4ex;		/* button's width */
+	border-radius:	50%;		/* button's shape */
+}
+
+#tongue:hover {
+	border:		0.2ex inset #ffffff;
+}
