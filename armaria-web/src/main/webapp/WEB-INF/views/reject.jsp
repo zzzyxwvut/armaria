@@ -12,7 +12,7 @@
 		<title><spring:message code="reject.title" /></title>
 		<link rel="icon" href="${pageContext.request.contextPath}/resources/css/images/doric_fluted-0-32x32.png"
 			type="image/png" />
-		<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/page.css"
+		<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/basic.css"
 			type="text/css" />
 	</head>
 
