@@ -106,4 +106,12 @@
 			org.example.zzzyxwvut.tomcat.resources.MailWriterBean
 		</resource-env-ref-type>
 	</resource-env-ref>
+
+	<jsp-config>
+		<jsp-property-group>
+			<url-pattern>*.jsp</url-pattern>
+			<scripting-invalid>true</scripting-invalid>
+			<trim-directive-whitespaces>true</trim-directive-whitespaces>
+		</jsp-property-group>
+	</jsp-config>
 </web-app>
