@@ -1,0 +1,56 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page session="true" %>
+
+<%@ taglib prefix="c"		uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="spring"	uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="sec"		uri="http://www.springframework.org/security/tags" %>
+
+<sec:authorize access="isAnonymous()" var="anonymous" />
+
+<div id="pagination">
+	<ul>
+		<c:choose>
+			<c:when test="${pages.currentIndex == 1}">
+				<li id="disabled"><a href="#">&lt;&lt;</a></li>
+				<li id="disabled"><a href="#">&lt;</a></li>
+			</c:when>
+			<c:otherwise>
+				<li><a href="${firstUrl}">&lt;&lt;</a></li>
+				<li><a href="${prevUrl}">&lt;</a></li>
+			</c:otherwise>
+		</c:choose>
+		<c:forEach var="i" begin="${pages.beginIndex}" end="${pages.endIndex}">
+			<c:url var="pageUrl" value="/${itemName}/${i}" />
+			<c:choose>
+				<c:when test="${i == pages.currentIndex}">
+					<li id="active"><a href="${pageUrl}">${i}</a></li>
+				</c:when>
+				<c:otherwise>
+					<li><a href="${pageUrl}">${i}</a></li>
+				</c:otherwise>
+			</c:choose>
+		</c:forEach>
+		<c:choose>
+			<c:when test="${pages.currentIndex == pages.totalPages}">
+				<li id="disabled"><a href="#">&gt;</a></li>
+				<li id="disabled"><a href="#">&gt;&gt;</a></li>
+			</c:when>
+			<c:otherwise>
+				<li><a href="${nextUrl}">&gt;</a></li>
+				<li><a href="${lastUrl}">&gt;&gt;</a></li>
+			</c:otherwise>
+		</c:choose>
+		<c:choose>
+			<c:when test="${anonymous}">
+				<li id="bale"><a href="${relIndex}">
+					<spring:message code="paging.main" />
+				</a></li>
+			</c:when>
+			<c:otherwise>
+				<li id="bale"><a href="${relProfile}">
+					<spring:message code="paging.profile" />
+				</a></li>
+			</c:otherwise>
+		</c:choose>
+	</ul>
+</div>
