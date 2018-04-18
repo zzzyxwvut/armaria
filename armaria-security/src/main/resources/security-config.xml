@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context.xsd
+http://www.springframework.org/schema/security
+http://www.springframework.org/schema/security/spring-security.xsd">
+
+	<context:component-scan base-package="org.example.zzzyxwvut.armaria.security.impl" />
+	<context:component-scan base-package="org.example.zzzyxwvut.armaria.security.listeners" />
+
+	<http>
+		<intercept-url pattern="/"		access="permitAll" requires-channel="https" />
+		<intercept-url pattern="/error"		access="permitAll" requires-channel="https" />
+		<intercept-url pattern="/index"		access="permitAll" requires-channel="https" />
+		<intercept-url pattern="/invalid"	access="permitAll" requires-channel="https" />
+		<intercept-url pattern="/reject"	access="permitAll" requires-channel="https" />
+		<intercept-url pattern="/signin"	access="permitAll" requires-channel="https" />
+		<intercept-url pattern="/signup"	access="permitAll" requires-channel="https" />
+		<intercept-url pattern="/translate"	access="permitAll" requires-channel="https" />
+		<intercept-url pattern="/remember"	access="permitAll" requires-channel="https" />
+		<intercept-url pattern="/forgotten"	access="permitAll" requires-channel="https" />
+
+		<intercept-url pattern="/resources/css/**"	access="permitAll" requires-channel="any" />
+		<intercept-url pattern="/resources/**"	access="denyAll" requires-channel="any" />
+
+		<intercept-url pattern="/books/borrow"	access="isAuthenticated()" requires-channel="https" />
+		<intercept-url pattern="/books/waitlist" access="isAuthenticated()" requires-channel="https" />
+		<intercept-url pattern="/books/**"	access="permitAll" requires-channel="https" />
+
+		<intercept-url pattern="/users/**"	access="hasAuthority('patron')" requires-channel="https" />
+		<intercept-url pattern="/encrypt"	access="hasAuthority('patron')" requires-channel="https" />
+		<intercept-url pattern="/encryptor"	access="hasAuthority('patron')" requires-channel="https" />
+
+		<intercept-url pattern="/**"		access="isAuthenticated()" requires-channel="https" />
+
+		<form-login login-page="/index"
+				login-processing-url="/signin"
+				authentication-failure-url="/reject"
+				username-parameter="login"
+				password-parameter="password"
+				default-target-url="/profile" />
+		<logout delete-cookies="JSESSIONID" logout-success-url="/index" />
+
+		<csrf disabled="true" />
+	</http>
+
+	<beans:bean id="localAuthenticationProvider"
+		class="org.example.zzzyxwvut.armaria.security.impl.LocalAuthenticationProvider" />
+
+	<authentication-manager>
+		<authentication-provider ref="localAuthenticationProvider" />
+	</authentication-manager>
+</beans:beans>
