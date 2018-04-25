@@ -1,5 +1,7 @@
 package org.example.zzzyxwvut.armaria.validators;
 
+import java.util.regex.Pattern;
+
 import org.example.zzzyxwvut.armaria.beans.UserBean;
 import org.example.zzzyxwvut.armaria.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,8 @@ public class OldUserValidator implements Validator
 {
 	@Autowired
 	private UserService userService;
+
+	private static final Pattern validEmail	= Pattern.compile(".+@.+");
 
 	@Override
 	public boolean supports(Class<?> clazz)
@@ -43,7 +47,7 @@ public class OldUserValidator implements Validator
 		}
 
 		if (!emptyEmail) {
-			if (!user.getEmail().matches(".+@.+"))
+			if (!OldUserValidator.validEmail.matcher(user.getEmail()).matches())
 				errors.rejectValue("email", "email.pattern");
 
 			if ((user.getEmail().length() < 3
