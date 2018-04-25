@@ -118,8 +118,8 @@ public enum Constants
 	public enum QUOTA
 	{
 		LOANS		(5L),
-		DAYS		(7L),
-		DAYS_AS_MILLISEC(TimeUnit.DAYS.toMillis(7L)),
+		DAYS		(14L),
+		DAYS_AS_MILLISEC(TimeUnit.DAYS.toMillis(14L)),
 		TICKETS		(2L);
 
 		private final long value;
