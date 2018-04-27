@@ -1,20 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:mvc="http://www.springframework.org/schema/mvc"
 	xmlns:p="http://www.springframework.org/schema/p"
-	xsi:schemaLocation="http://www.springframework.org/schema/mvc
-http://www.springframework.org/schema/mvc/spring-mvc.xsd
-http://www.springframework.org/schema/beans
+	xmlns:security="http://www.springframework.org/schema/security"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
 http://www.springframework.org/schema/beans/spring-beans.xsd
 http://www.springframework.org/schema/context
-http://www.springframework.org/schema/context/spring-context.xsd">
+http://www.springframework.org/schema/context/spring-context.xsd
+http://www.springframework.org/schema/mvc
+http://www.springframework.org/schema/mvc/spring-mvc.xsd
+http://www.springframework.org/schema/security
+http://www.springframework.org/schema/security/spring-security.xsd
+http://www.springframework.org/schema/util
+http://www.springframework.org/schema/util/spring-util.xsd">
 
-	<mvc:annotation-driven />
+	<mvc:annotation-driven>
+		<mvc:argument-resolvers>
+			<bean class="org.springframework.security.web.method.annotation.AuthenticationPrincipalArgumentResolver" />
+		</mvc:argument-resolvers>
+	</mvc:annotation-driven>
 
 	<context:component-scan base-package="org.example.zzzyxwvut.armaria.handlers" />
 	<context:component-scan base-package="org.example.zzzyxwvut.armaria.controllers" />
+	<context:component-scan base-package="org.example.zzzyxwvut.armaria.validators" />
+
+	<bean class="org.springframework.context.support.ReloadableResourceBundleMessageSource"
+		id="messageSource" p:defaultEncoding="UTF-8" p:fallbackToSystemLocale="false"
+		p:basenames="classpath:i18n/application, classpath:i18n/validation" />
+
+	<bean class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"
+		p:validationMessageSource-ref="messageSource" />
+
+	<security:global-method-security pre-post-annotations="enabled" />
+
+	<mvc:resources mapping="/resources/**"	location="/resources/" />
+	<mvc:resources mapping="/images/**"	location="/resources/css/images/" />
+	<mvc:resources mapping="/fonts/**"	location="/resources/css/fonts/" />
+
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/**" />
+			<mvc:exclude-mapping path="/index" />
+			<mvc:exclude-mapping path="/edit" />
+			<bean class="org.example.zzzyxwvut.armaria.handlers.SecureCredentialsInterceptor" />
+		</mvc:interceptor>
+
+		<bean class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor"
+			p:paramName="locale" />
+	</mvc:interceptors>	<!-- Change locale, e.g. "https://URL?locale=en_US" -->
+
+	<bean class="org.springframework.web.servlet.i18n.CookieLocaleResolver"
+		id="localeResolver" p:cookieName="locale" />
 
 	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"
 		p:prefix="/WEB-INF/views/" p:suffix=".jsp" />
