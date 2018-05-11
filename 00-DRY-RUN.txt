@@ -1,0 +1,270 @@
+# NOTE: Substitute an actual value for any of the following placeholders:
+#
+#	/path/to/*
+#	<[A-Z0-9_]+>
+#	foo
+#	foo_BAR
+#	Abracadabra
+
+PROJECT_BASE_DIR=/path/to/base_dir
+PROJECT_GIT_DIR=/path/to/git_dir
+
+
+### 1.  PROVIDE NECESSARY CERTIFICATES AND SECRET KEYS. {{{1
+
+# 1) Create logs and keys directories:
+mkdir -p ${PROJECT_BASE_DIR}/{logs,keys} && cd $_
+
+
+# 2) Generate a self-signed certificate with the `keytool' JDK utility, e.g.
+keytool -genkey -alias "<CERT_NAME>" -keyalg RSA -dname 'CN=tomcat' \
+    -keystore cert.jks -storetype jks -validity 365
+
+
+# 3) Generate two secret keys, e.g.
+keytool -genseckey -v -alias "<UNIQUE_NAME_01>" -keyalg AES -keysize 128 \
+    -storetype jceks -keystore keys.jks
+keytool -genseckey -v -alias "<UNIQUE_NAME_02>" -keyalg AES -keysize 128 \
+    -storetype jceks -keystore keys.jks
+
+
+# NOTE: The user account that runs the Tomcat JVM must have sufficient
+#	permissions to read these keystore files.
+
+
+
+
+### 2.  CREATE A SCHEMA AND A USER. {{{1
+
+sudo mysql -p -u root << EOF
+CREATE SCHEMA foo;
+GRANT ALL ON foo.* TO '<USERNAME>'@'localhost' IDENTIFIED BY '<PASSWORD>';
+
+FLUSH PRIVILEGES;
+EOF
+
+
+
+
+### 3.  CLONE THE REPOSITORY. {{{1
+
+cd ${PROJECT_GIT_DIR}
+git clone https://github.com/zzzyxwvut/armaria.git
+
+
+
+
+### 4.  SUPPLY EXCLUDED FILES. {{{1
+
+cp /tmp/V6__supply_with_books.sql \
+    -t ${PROJECT_GIT_DIR}/armaria/armaria-migration/src/main/resources/db/migration/
+cp /tmp/20130711_105350-0.jpg \
+    -t ${PROJECT_GIT_DIR}/armaria/armaria-web/src/main/webapp/resources/css/images/
+
+
+
+
+### 5.  CONFIGURE THE LOGGING BASE DIRECTORY. {{{1
+
+# Point the property.dirName property to the ${PROJECT_BASE_DIR}/logs directory in
+# the ${PROJECT_GIT_DIR}/armaria/armaria-logging/src/main/resources/log4j2.properties file.
+
+
+
+
+### 6.  INSTALL LOCALLY THE APPLICATION. {{{1
+
+cd ${PROJECT_GIT_DIR}/armaria
+mvn install
+
+
+
+
+### 7.  CONFIGURE THE TOMCAT CONTAINER. {{{1
+
+# 1) Create a ${CATALINA_BASE}/shared/lib directory, if missing:
+TOMCAT_SHARED=${CATALINA_BASE}/shared/lib
+mkdir -p ${TOMCAT_SHARED}
+
+
+# 2) Copy the mysql-connector-java library to the TOMCAT_SHARED
+# directory, if missing:
+cd ${PROJECT_GIT_DIR}/armaria
+CON_VER=$(mawk '{ if ($1 ~ /<mysql.version>/) exit } END { gsub(/[ \t]|<\/?mysql.version>/, ""); print }' pom.xml)
+cp ~/.m2/repository/mysql/mysql-connector-java/${CON_VER}/mysql-connector-java-${CON_VER}.jar \
+    -t ${TOMCAT_SHARED}
+
+
+# 3) Copy the armaria-tomcat-beans/target/armaria-tomcat-beans-*.jar
+# library to the TOMCAT_SHARED directory:
+cp armaria-tomcat-beans/target/armaria-tomcat-beans-*.jar -t ${TOMCAT_SHARED}
+
+
+# 4) Make the common class loader aware of the TOMCAT_SHARED path.
+#
+# Append the #2 line below to the common.loader property in
+# the ${CATALINA_BASE}/conf/catalina.properties file:
+common.loader=" ... ",\
+"${catalina.base}/shared/lib","${catalina.base}/shared/lib/*.jar"	#2
+
+
+# 5) Add the following connector to the <Service> element of
+# the ${CATALINA_BASE}/conf/server.xml file (refer to the "1.  PROVIDE
+# NECESSARY CERTIFICATES AND SECRET KEYS." section above for details):
+<Service>
+    <Connector
+        SSLEnabled="true"
+        clientAuth="false"
+        keyAlias="<CERT_NAME>"
+        keyPass="<PASSWORD>"
+        keystoreFile="<KEYSTORE_FILE>"		<!-- Qualified absolutely or relatively -->
+        keystorePass="<KEYSTORE_PASSWORD>"	<!-- to the CATALINA_BASE directory. -->
+        maxThreads="150"
+        port="8443"
+        protocol="org.apache.coyote.http11.Http11NioProtocol"
+        scheme="https"
+        secure="true"
+        sslProtocol="TLS" />
+</Service>
+
+
+# 6) Add the following resources to the <GlobalNamingResources> element of the
+# ${CATALINA_BASE}/conf/server.xml file (refer to the following sections above:
+# "1.  PROVIDE NECESSARY CERTIFICATES AND SECRET KEYS." and "2.  CREATE A SCHEMA
+# AND A USER."; also see the armaria-tomcat-beans module classes' Javadocs for
+# details):
+<GlobalNamingResources>
+    <Resource
+        auth="Container"
+        driverClassName="com.mysql.cj.jdbc.Driver"
+        factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
+        logAbandoned="true"
+        maxWait="60000"
+        name="jdbc/poachers"
+        password="<PASSWORD>"
+        removeAbandoned="true"
+        removeAbandonedTimeout="120"
+        scope="Unshareable"
+        timeBetweenEvictionRunsMillis="4000"
+        type="javax.sql.DataSource"
+        url="jdbc:mysql://localhost:<PORT>/foo"
+        username="<USERNAME>" />
+
+    <Resource
+        aliasName="<UNIQUE_NAME_01>"
+        aliasWord="<PASSWORD_01>"
+        auth="Container"
+        extraName="<UNIQUE_NAME_02>"
+        extraWord="<PASSWORD_02>"
+        factory="org.apache.naming.factory.BeanFactory"
+        keyAlgorithm="<SECRET_KEY_GENERATING_ALGORITHM>"
+        name="bean/StoreBeanFactory"
+        scope="Unshareable"
+        storeName="<KEYSTORE_FILE>"			<!-- Qualified relatively to the HOME directory. -->
+        storeType="<KEYSTORE_TYPE>"
+        storeWord="<KEYSTORE_PASSWORD>"
+        type="org.example.zzzyxwvut.tomcat.resources.StoreBean" />
+
+    <Resource
+        auth="Container"
+        factory="org.apache.naming.factory.BeanFactory"
+        fileSuffix=".pdf"		<!-- See armaria-web/src/main/webapp/WEB-INF/views/loans.jsp -->
+        libraryName="<PATH_TO_LIBRARY_DIRECTORY>"	<!-- Qualified relatively to the HOME directory. -->
+        name="bean/LibrarianBeanFactory"
+        scope="Unshareable"
+        type="org.example.zzzyxwvut.tomcat.resources.LibrarianBean" />
+
+    <Resource
+        auth="Container"
+        factory="org.apache.naming.factory.BeanFactory"
+        host="<SMTP_HOST>"
+        name="bean/MailWriterBeanFactory"
+        password="<MAILBOX_PASSWORD>"
+        port="<PORT>"
+        protocol="<MAIL_PROTOCOL>"
+        scope="Unshareable"
+        type="org.example.zzzyxwvut.tomcat.resources.MailWriterBean"
+        username="<USERNAME>@<HOST>" />
+
+    <Resource
+        auth="Container"
+        factory="org.apache.naming.factory.BeanFactory"
+        name="bean/MailReaderBeanFactory"
+        poll="120000"
+        scope="Unshareable"
+        type="org.example.zzzyxwvut.tomcat.resources.MailReaderBean"
+        uri="(pop3|imaps)://<USERNAME>:<MAILBOX_PASSWORD>@<POP3_OR_IMAP_HOST>:<PORT>/INBOX" />
+        <!-- Use either uri="pop3://..." or uri="imaps://...". -->
+</GlobalNamingResources>
+
+
+
+
+### 8.  HAVE THE LIBRARY BOOKS AT ONE'S DISPOSAL. {{{1
+
+# The ${PROJECT_GIT_DIR}/armaria/armaria-web/src/main/webapp/WEB-INF/views/loans.jsp
+# file expects the following unified naming scheme:
+#
+#
+#	L001.pdf...  L009.pdf,
+#	L010.pdf...  L099.pdf,
+#	L100.pdf...  L999.pdf,
+#	L1000.pdf...
+
+#ln -s ${BOOK_LIBRARY} ~/\<PATH_TO_LIBRARY_DIRECTORY\>
+
+
+
+
+### 9.  DEPLOY THE APPLICATION. {{{1
+
+# 1) Define the host as follows in the ${CATALINA_BASE}/conf/server.xml file:
+<Engine>
+    <Host
+        appBase="webapps"	<!-- or any other parent directory of WAR files. -->
+        autoDeploy="true"
+        deployOnStartup="false"
+        name="localhost"
+        unpackWARs="true">
+</Engine>
+
+
+# 2) Start the Tomcat container:
+${CATALINA_BASE}/bin/startup.sh
+
+
+# 3) Install the web application into the Tomcat server:
+cp ${PROJECT_GIT_DIR}/armaria/armaria-web/target/armaria-web-*.war \
+    -t ${CATALINA_BASE}/webapps
+
+
+# 4) Access the index page:
+${BROWSER} https://localhost:8443/armaria-web-0.0.1-SNAPSHOT/ &
+
+
+
+
+### 10.  HOT DEPLOY INTERNATIONALISATION FILES. {{{1
+
+# 1) Copy translated files:
+cd ${PROJECT_GIT_DIR}/armaria
+cp /tmp/message_foo_BAR.properties     -t armaria-mail/src/main/resources/i18n/
+cp /tmp/application_foo_BAR.properties -t armaria-web/src/main/resources/i18n/
+cp /tmp/validation_foo_BAR.properties  -t armaria-web/src/main/resources/i18n/
+
+
+# 2) Add a new radio button entry under the #translate form in
+# the ${PROJECT_GIT_DIR}/armaria/armaria-web/src/main/webapp/WEB-INF/views/index.jsp file:
+#
+#
+#	<p><input name="locale" type="radio" value="foo_BAR">Abracadabra
+
+
+# 3) Re-install and re-deploy the application:
+mvn clean install
+cp ${PROJECT_GIT_DIR}/armaria/armaria-web/target/armaria-web-*.war \
+    -t ${CATALINA_BASE}/webapps
+
+
+
+
