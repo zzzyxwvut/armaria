@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.itextpdf.text.Document;
 import com.itextpdf.text.io.RandomAccessSource;
@@ -60,8 +59,7 @@ public class ViewerController
 				produces = MediaType.APPLICATION_PDF_VALUE)
 	public void viewer(@ModelAttribute("tome") String tome,
 						HttpServletRequest request,
-						HttpServletResponse response,
-						RedirectAttributes attr)
+						HttpServletResponse response)
 	{
 		Document document	= null;
 		PdfReader reader	= null;
@@ -95,12 +93,9 @@ public class ViewerController
 
 			stream.writeTo(os);
 			os.flush();
-			response.sendRedirect("/viewer");
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		} finally {
-			attr.addFlashAttribute("tome", tome);
-
 			try {
 				if (reader != null)
 					reader.close();
