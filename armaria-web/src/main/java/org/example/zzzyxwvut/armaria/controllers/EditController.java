@@ -3,10 +3,17 @@ package org.example.zzzyxwvut.armaria.controllers;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.example.zzzyxwvut.armaria.annotation.AuthenticatedPersistentUserBean;
+import org.example.zzzyxwvut.armaria.beans.BookBean;
+import org.example.zzzyxwvut.armaria.beans.LoanBean;
+import org.example.zzzyxwvut.armaria.beans.TicketBean;
 import org.example.zzzyxwvut.armaria.beans.UserBean;
 import org.example.zzzyxwvut.armaria.crypto.Encryptor;
+import org.example.zzzyxwvut.armaria.domain.naming.Constants.BOOKS;
+import org.example.zzzyxwvut.armaria.events.MaturedTicketEvent;
 import org.example.zzzyxwvut.armaria.security.beans.PersistentUserBean;
 import org.example.zzzyxwvut.armaria.security.events.PrincipalUpdatedEvent;
+import org.example.zzzyxwvut.armaria.service.BookService;
+import org.example.zzzyxwvut.armaria.service.TicketService;
 import org.example.zzzyxwvut.armaria.service.UserService;
 import org.example.zzzyxwvut.armaria.validators.OldUserValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +38,12 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class EditController
 {
 	@Autowired
+	private BookService bookService;
+
+	@Autowired
+	private TicketService ticketService;
+
+	@Autowired
 	private UserService userService;
 
 	@Autowired
@@ -49,6 +62,42 @@ public class EditController
 
 	@GetMapping("/edit")
 	public String edit()	{ return "edit"; }
+
+	@PreAuthorize("!hasAuthority('patron')")
+	@PostMapping("/leave")
+	public String leave(@AuthenticatedPersistentUserBean PersistentUserBean user0)
+	{
+		if (user0.getRole().isPatron())
+			return "redirect:/edit";
+
+		UserBean user	= userService.getUserByLogin(user0.getLogin());
+		Iterable<TicketBean> tickets	= ticketService.getAllTickets();
+
+		for (LoanBean loan : user.getLoans()) {
+			BookBean book	= loan.getBook();
+			boolean found	= false;
+
+			for (TicketBean ticket : tickets) {
+				if (!ticket.getBook().equals(book))
+					continue;
+
+				publisher.publishEvent(new MaturedTicketEvent(
+					loan.getId(), ticket, null, "en_US"));
+				found	= true;
+				break;
+			}
+
+			if (!found) {
+				book.setStatus(BOOKS.AVAILABLE);
+				bookService.saveBook(book);
+			}
+		}
+
+		userService.deleteUser(user.getId());
+		user.setPassword("");
+		logger.debug("Removed a user " + user);
+		return "redirect:/logout";	/* NOTE: The default Security URL. */
+	}
 
 	@PostMapping("/update")
 	public String update(@Validated @ModelAttribute("dummyUser") UserBean dummyUser,

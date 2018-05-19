@@ -32,7 +32,8 @@
 		</div>
 
 		<br><br><br><br>
-		<div id="edit" align="center">
+		<div align="center">
+			<div id="edit">
 			<form:form id="update" action="update" method="post" modelAttribute="dummyUser">
 				<form:hidden path="login" />
 
@@ -53,6 +54,17 @@
 				<p><input name="s" type="submit" value="OK" alt="OK" title="${submit}">
 				</fieldset>
 			</form:form>
+
+			<br>
+			<form id="leave" action="leave" method="post">
+				<fieldset>
+					<p><input type="checkbox" id="confirm"
+						onchange="document.getElementById('remove').disabled = !checked" />
+					<p><label for="confirm"><spring:message code="form.expunge" /></label>
+					<p><input type="submit" id="remove" value="OK" title="${submit}" disabled />
+				</fieldset>
+			</form>
+			</div>
 		</div>
 	</body>
 </html>
