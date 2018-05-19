@@ -1,6 +1,5 @@
 package org.example.zzzyxwvut.armaria.listeners;
 
-import java.util.Locale;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
@@ -15,7 +14,6 @@ import org.example.zzzyxwvut.armaria.beans.LoanBean;
 import org.example.zzzyxwvut.armaria.beans.TicketBean;
 import org.example.zzzyxwvut.armaria.domain.naming.Constants.BOOKS;
 import org.example.zzzyxwvut.armaria.domain.naming.Constants.LOANS;
-import org.example.zzzyxwvut.armaria.events.LocaleChangedEvent;
 import org.example.zzzyxwvut.armaria.events.MaturedTicketEvent;
 import org.example.zzzyxwvut.armaria.service.BookService;
 import org.example.zzzyxwvut.armaria.service.LoanService;
@@ -55,7 +53,6 @@ public final class BookCollectorListener
 	private final Random random	= new Random();
 	private volatile boolean dirty	= true;
 	private volatile boolean alive	= true;
-	private volatile String locale	= "en_US";
 	private Thread collector, registrar;
 
 	public BookCollectorListener()
@@ -145,7 +142,7 @@ public final class BookCollectorListener
 			try {
 				/* Lend the book to the oldest ticket-holder. */
 				publisher.publishEvent(new MaturedTicketEvent(
-					loan.getId(), ticket, lock, locale));
+					loan.getId(), ticket, lock, "en_US"));
 			} catch (Exception e) {
 				logger.error(e.getMessage(), e);
 				shelve(loan);
@@ -354,14 +351,5 @@ public final class BookCollectorListener
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
 		}
-	}
-
-	@EventListener
-	public void handleLocaleChangedEvent(LocaleChangedEvent event)
-	{
-		Locale locale	= event.getLocale();
-		this.locale	= new StringBuilder(5)
-			.append(locale.getLanguage()).append("_")
-			.append(locale.getCountry()).toString();
 	}
 }

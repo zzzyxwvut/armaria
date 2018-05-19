@@ -23,7 +23,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -87,9 +86,7 @@ public class UserController
 
 	@PostMapping("/expunge")
 	public String expunge(@RequestParam("user") Long userId,
-				@ModelAttribute("viewPage") Integer page,
-				@CookieValue(value = "locale", defaultValue = "en_US")
-								String locale)
+				@ModelAttribute("viewPage") Integer page)
 	{
 		UserBean user	= userService.getUserById(userId);
 
@@ -112,7 +109,7 @@ public class UserController
 					continue;
 
 				publisher.publishEvent(new MaturedTicketEvent(
-					loan.getId(), ticket, null, locale));
+					loan.getId(), ticket, null, "en_US"));
 				found	= true;
 				break;
 			}

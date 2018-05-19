@@ -18,7 +18,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -60,9 +59,7 @@ public class LoanController
 
 	@PostMapping("/restore")
 	public String restore(@RequestParam("book") Integer bookId,
-				@RequestParam("loan") Long loanId,
-				@CookieValue(value = "locale", defaultValue = "en_US")
-								String locale)
+				@RequestParam("loan") Long loanId)
 	{
 		BookBean book	= bookService.getBookById(bookId);
 
@@ -74,7 +71,7 @@ public class LoanController
 				continue;
 
 			publisher.publishEvent(new MaturedTicketEvent(
-						loanId, ticket, null, locale));
+						loanId, ticket, null, "en_US"));
 			return "redirect:/loans/items";
 		}
 
