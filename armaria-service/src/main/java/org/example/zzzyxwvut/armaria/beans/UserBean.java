@@ -1,6 +1,7 @@
 package org.example.zzzyxwvut.armaria.beans;
 
 import java.util.LinkedHashSet;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 
@@ -12,6 +13,7 @@ public class UserBean
 	private String login;
 	private String password;
 	private String email;
+	private Locale locale	= Locale.US;
 	private USERS role	= USERS.CLIENT;
 	private USERS status	= USERS.INVALID;
 	private Set<LoanBean> loans	= new LinkedHashSet<>();
@@ -38,6 +40,9 @@ public class UserBean
 	public String getEmail()		{ return email; }
 	public void setEmail(String email)	{ this.email	= email; }
 
+	public Locale getLocale()		{ return locale; }
+	public void setLocale(Locale locale)	{ this.locale	= locale; }
+
 	public USERS getRole()			{ return role; }
 	public void setRole(USERS role)		{ this.role	= role; }
 
@@ -59,6 +64,7 @@ public class UserBean
 			.append("\nlogin:\t")	.append(getLogin())
 			.append("\npassword:\t").append(getPassword())
 			.append("\nemail:\t")	.append(getEmail())
+			.append("\nlocale:\t")	.append(getLocale())
 			.append("\nrole:\t")	.append(getRole())
 			.append("\nstatus:\t")	.append(getStatus())
 			.append("\ntessera:\t")	.append(getTessera());

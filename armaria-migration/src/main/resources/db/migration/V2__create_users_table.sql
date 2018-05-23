@@ -17,6 +17,7 @@ CREATE TABLE `users` (
   `login` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
+  `locale` varchar(32) NOT NULL,
   `role` enum('CLIENT','PATRON') NOT NULL,
   `status` enum('INVALID','VALID') NOT NULL,
   `token` text NULL,

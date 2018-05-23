@@ -2,6 +2,7 @@ package org.example.zzzyxwvut.armaria.domain;
 
 import java.io.Serializable;
 import java.util.LinkedHashSet;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 
@@ -23,6 +24,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+import org.example.zzzyxwvut.armaria.domain.converters.LocaleConverter;
 import org.example.zzzyxwvut.armaria.domain.converters.UsersConverter;
 import org.example.zzzyxwvut.armaria.domain.naming.Constants.USERS;
 
@@ -31,11 +33,12 @@ import org.example.zzzyxwvut.armaria.domain.naming.Constants.USERS;
 @Table(name = "users")
 public class User implements Serializable
 {
-	private static final long serialVersionUID	= -7878802240175456737L;
+	private static final long serialVersionUID	= 5268265577847242002L;
 	private Long id;
 	private String login;
 	private String password;
 	private String email;
+	private Locale locale	= Locale.US;
 	private USERS role	= USERS.CLIENT;
 	private USERS status	= USERS.INVALID;
 	private Set<Loan> loans		= new LinkedHashSet<>();
@@ -80,6 +83,12 @@ public class User implements Serializable
 	public String getEmail()		{ return email; }
 	public void setEmail(String email)	{ this.email	= email; }
 
+	@NotNull(message = "{generic.empty}")
+	@Convert(converter = LocaleConverter.class, disableConversion = false)
+	@Column(name = "locale", length = 32, nullable = false)
+	public Locale getLocale()		{ return locale; }
+	public void setLocale(Locale locale)	{ this.locale	= locale; }
+
 	@NotNull
 	@Convert(converter = UsersConverter.class, disableConversion = false)
 	@Column(name = "role", nullable = false)
@@ -111,6 +120,7 @@ public class User implements Serializable
 			.append("\nlogin:\t")	.append(getLogin())
 			.append("\npassword:\t").append(getPassword())
 			.append("\nemail:\t")	.append(getEmail())
+			.append("\nlocale:\t")	.append(getLocale())
 			.append("\nrole:\t")	.append(getRole())
 			.append("\nstatus:\t")	.append(getStatus())
 			.append("\ntessera:\t")	.append(getTessera());
