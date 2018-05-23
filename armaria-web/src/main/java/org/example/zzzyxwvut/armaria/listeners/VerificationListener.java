@@ -31,6 +31,7 @@ public final class VerificationListener
 						uuid.getLeastSignificantBits());
 		user.getTessera().setEntry(LocalDateTime.now());
 		user.getTessera().setToken(token);
+		user.setLocale(event.getLocale());
 
 		if (userService.count() == 0L)
 			user.setRole(USERS.PATRON);

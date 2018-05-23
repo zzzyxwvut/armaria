@@ -71,7 +71,8 @@ public class LoanController
 				continue;
 
 			publisher.publishEvent(new MaturedTicketEvent(
-						loanId, ticket, null, "en_US"));
+						loanId, ticket, null,
+						ticket.getUser().getLocale()));
 			return "redirect:/loans/items";
 		}
 

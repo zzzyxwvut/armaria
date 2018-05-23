@@ -1,5 +1,7 @@
 package org.example.zzzyxwvut.armaria.controllers;
 
+import java.security.Principal;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.example.zzzyxwvut.armaria.beans.UserBean;
@@ -61,14 +63,14 @@ public class IndexController
 
 	@PostMapping("/translate")
 	public String translate(@RequestParam(value = "locale",
-			defaultValue = "en_US") String locale, RedirectAttributes attr)
+					defaultValue = "en_US") String locale,
+							Principal principal)
 	{
-		/*
-		 * The attribute name should match the parameter name of
-		 * the LocaleChangeInterceptor (see dispatcher-servlet.xml).
-		 */
-		attr.addFlashAttribute("locale", locale);
-		publisher.publishEvent(new LocaleChangedEvent(new UserBean(), locale));
+		if (principal != null) {
+			UserBean user = userService.getUserByLogin(principal.getName());
+			publisher.publishEvent(new LocaleChangedEvent(user, locale));
+		}
+
 		return "redirect:/index";
 	}
 

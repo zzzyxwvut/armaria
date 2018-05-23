@@ -31,7 +31,10 @@ public class UserEvent extends ApplicationEvent
 	{
 		super(user);
 		this.user	= Objects.requireNonNull(user);
-		this.locale	= Objects.requireNonNull(locale);
+		this.locale	= (locale != null)
+					? locale
+					: LocaleContextHolder.getLocale();
+		this.user.setLocale(this.locale);
 	}
 
 	public UserEvent(UserBean user, String locale)
@@ -40,15 +43,17 @@ public class UserEvent extends ApplicationEvent
 		this.user	= Objects.requireNonNull(user);
 
 		if (locale != null) {
-			String[] item	= locale.split("_", 3);
-			this.locale	= (item.length == 3)
-						? new Locale(item[0], item[1], item[2])
-						: (item.length == 2)
-							? new Locale(item[0], item[1])
-							: new Locale(item[0]);
+			String[] items	= locale.split("_", 3);
+			this.locale	= (items.length == 3)
+					? new Locale(items[0], items[1], items[2])
+					: (items.length == 2)
+						? new Locale(items[0], items[1])
+						: new Locale(items[0]);
 		} else {
 			this.locale	= LocaleContextHolder.getLocale();
 		}
+
+		this.user.setLocale(this.locale);
 	}
 
 	public UserBean getUser()	{ return user; }

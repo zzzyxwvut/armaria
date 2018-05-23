@@ -142,7 +142,8 @@ public final class BookCollectorListener
 			try {
 				/* Lend the book to the oldest ticket-holder. */
 				publisher.publishEvent(new MaturedTicketEvent(
-					loan.getId(), ticket, lock, "en_US"));
+						loan.getId(), ticket, lock,
+						ticket.getUser().getLocale()));
 			} catch (Exception e) {
 				logger.error(e.getMessage(), e);
 				shelve(loan);
