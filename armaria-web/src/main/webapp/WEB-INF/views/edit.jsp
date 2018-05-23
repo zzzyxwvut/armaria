@@ -55,6 +55,7 @@
 				</fieldset>
 			</form:form>
 
+			<sec:authorize access="!hasAuthority('patron')">
 			<br>
 			<form id="leave" action="leave" method="post">
 				<fieldset>
@@ -64,6 +65,7 @@
 					<p><input type="submit" id="remove" value="OK" title="${submit}" disabled />
 				</fieldset>
 			</form>
+			</sec:authorize>
 			</div>
 		</div>
 	</body>
