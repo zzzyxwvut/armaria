@@ -5,7 +5,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -47,7 +47,7 @@ public final class BookCollectorListener
 
 	private final Logger logger	= LogManager.getLogger();
 	private final ScheduledExecutorService scheduler;
-	private final AtomicLong workers;
+	private final AtomicInteger workers;
 	private final CountDownLatch latchPoll;
 	private final Object lock	= new Object();
 	private final Random random	= new Random();
@@ -58,7 +58,7 @@ public final class BookCollectorListener
 	public BookCollectorListener()
 	{
 		final int size	= 32;
-		workers		= new AtomicLong(size);
+		workers		= new AtomicInteger(size);
 
 		/*
 		 * (1) if the thread count is less than the core size (32),
@@ -199,7 +199,7 @@ public final class BookCollectorListener
 				for (LoanBean loan : loans) {
 					if (!alive) {
 						return;
-					} else if (workers.get() == 0L) {
+					} else if (workers.get() == 0) {
 						break;		/* All workers are occupied. */
 					} else if (loan.getStatus().isManaged()) {
 						continue;	/* Let the workers sleep. */
