@@ -3,9 +3,9 @@ package org.example.zzzyxwvut.armaria.listeners;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -47,7 +47,6 @@ public final class BookCollectorListener
 
 	private final Logger logger	= LogManager.getLogger();
 	private final ScheduledExecutorService scheduler;
-	private final AtomicInteger workers;
 	private final CountDownLatch latchPoll;
 	private final Object lock	= new Object();
 	private final Random random	= new Random();
@@ -57,9 +56,6 @@ public final class BookCollectorListener
 
 	public BookCollectorListener()
 	{
-		final int size	= 32;
-		workers		= new AtomicInteger(size);
-
 		/*
 		 * (1) if the thread count is less than the core size (32),
 		 *	create a new thread for the immediate task
@@ -70,7 +66,7 @@ public final class BookCollectorListener
 		 *	[1, Integer.MAX_VALUE] to run the task
 		 * (4) else, reject the task ((0x7fffffff << 1) + 32 + 1)
 		 */
-		scheduler	= Executors.newScheduledThreadPool(size);
+		scheduler	= Executors.newScheduledThreadPool(32);
 		latchPoll	= new CountDownLatch(1);
 	}
 
@@ -95,81 +91,76 @@ public final class BookCollectorListener
 	/* Collects a borrowed book. */
 	private void collect(LoanBean loan)
 	{
-		try {
-			try {	/* Could be pre-empted by the client. */
-				if (!loanService.hasLoan(loan.getId()))
-					return;
-			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
-			}
-
-			if (System.currentTimeMillis() < loan.getTerm().getTime()) {
-				logger.warn(new StringBuilder(128)
-					.append("Book-collector: reject premature collection: [")
-					.append(loan.getId()).append("]: ")
-					.append(loan.getTerm().getTime()
-						- System.currentTimeMillis()));
-				loan.setStatus(LOANS.DEFAULT);	/* Make it eligible again. */
-
-				try {
-					synchronized (lock) {
-						loanService.saveLoan(loan);
-					}
-				} catch (Exception e) {
-					logger.error(e.getMessage(), e);
-				}
-
+		try {	/* Could be pre-empted by the client. */
+			if (!loanService.hasLoan(loan.getId()))
 				return;
-			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
 
-			logger.debug(new StringBuilder(128)
-				.append("Book-collector: commence collecting: [")
+		if (System.currentTimeMillis() < loan.getTerm().getTime()) {
+			logger.warn(new StringBuilder(128)
+				.append("Book-collector: reject premature collection: [")
 				.append(loan.getId()).append("]: ")
-				.append(loan.getTerm()).append("\n")
-				.append(loan.getBook()));
-			Iterable<TicketBean> tickets	= null;
+				.append(loan.getTerm().getTime()
+					- System.currentTimeMillis()));
+			loan.setStatus(LOANS.DEFAULT);	/* Make it eligible again. */
 
 			try {
 				synchronized (lock) {
-					tickets	= ticketService.getAllTickets();
+					loanService.saveLoan(loan);
 				}
 			} catch (Exception e) {
 				logger.error(e.getMessage(), e);
-				shelve(loan);
-				return;
 			}
 
-			for (TicketBean ticket : tickets) {
-				if (!alive) {
-					return;
-				} else if (!ticket.getBook()
-						.equals(loan.getBook())) {
-					continue;
-				}
-
-				/*
-				 * Note: We assume that this book is the only copy
-				 *	and that the user has met the ticket quota.
-				 */
-				try {
-					/* Lend the book to the oldest ticket-holder. */
-					publisher.publishEvent(
-						new MaturedTicketEvent(
-							loan.getId(), ticket, lock,
-							ticket.getUser().getLocale()));
-				} catch (Exception e) {
-					logger.error(e.getMessage(), e);
-					shelve(loan);
-				}
-
-				return;
-			}
-
-			shelve(loan);
-		} finally {
-			if (alive)
-				workers.incrementAndGet();
+			return;
 		}
+
+		logger.debug(new StringBuilder(128)
+			.append("Book-collector: commence collecting: [")
+			.append(loan.getId()).append("]: ")
+			.append(loan.getTerm()).append("\n")
+			.append(loan.getBook()));
+		Iterable<TicketBean> tickets	= null;
+
+		try {
+			synchronized (lock) {
+				tickets	= ticketService.getAllTickets();
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			shelve(loan);
+			return;
+		}
+
+		for (TicketBean ticket : tickets) {
+			if (!alive) {
+				return;
+			} else if (!ticket.getBook()
+					.equals(loan.getBook())) {
+				continue;
+			}
+
+			/*
+			 * Note: We assume that this book is the only copy
+			 *	and that the user has met the ticket quota.
+			 */
+			try {
+				/* Lend the book to the oldest ticket-holder. */
+				publisher.publishEvent(
+					new MaturedTicketEvent(
+						loan.getId(), ticket, lock,
+						ticket.getUser().getLocale()));
+			} catch (Exception e) {
+				logger.error(e.getMessage(), e);
+				shelve(loan);
+			}
+
+			return;
+		}
+
+		shelve(loan);
 	}
 
 	/* Manages the loans. */
@@ -199,8 +190,6 @@ public final class BookCollectorListener
 				for (LoanBean loan : loans) {
 					if (!alive) {
 						return;
-					} else if (workers.get() == 0) {
-						break;		/* All workers are occupied. */
 					} else if (loan.getStatus().isManaged()) {
 						continue;	/* Let the workers sleep. */
 					}
@@ -225,20 +214,24 @@ public final class BookCollectorListener
 								- System.currentTimeMillis();
 					delay	= (delay < 120000L) ? 120000L : delay;
 
-					/* Assign a worker to manage this loan. */
-					scheduler.schedule(new Runnable() {
-						@Override
-						public void run()
-						{
-							collect(loan);
-						}
-					}, delay, TimeUnit.MILLISECONDS);
+					try {
+						/* Assign a worker to manage this loan. */
+						scheduler.schedule(new Runnable() {
+							@Override
+							public void run()
+							{
+								collect(loan);
+							}
+						}, delay, TimeUnit.MILLISECONDS);
+					} catch (RejectedExecutionException e) {
+						logger.error(e);
+						break;
+					}
 
 					logger.debug(new StringBuilder(64)
 						.append("Book-collector: register: [")
 						.append(loan.getId()).append("]: ")
 						.append(loan.getTerm()).toString());
-					workers.decrementAndGet();
 				}
 			}
 
