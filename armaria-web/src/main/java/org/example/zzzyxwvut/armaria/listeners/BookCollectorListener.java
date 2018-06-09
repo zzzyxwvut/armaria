@@ -95,75 +95,81 @@ public final class BookCollectorListener
 	/* Collects a borrowed book. */
 	private void collect(LoanBean loan)
 	{
-		workers.incrementAndGet();
+		try {
+			try {	/* Could be pre-empted by the client. */
+				if (!loanService.hasLoan(loan.getId()))
+					return;
+			} catch (Exception e) {
+				logger.error(e.getMessage(), e);
+			}
 
-		try {	/* Could be pre-empted by the client. */
-			if (!loanService.hasLoan(loan.getId()))
-				return;
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-		}
-
-		if (System.currentTimeMillis() < loan.getTerm().getTime()) {
-			logger.warn(new StringBuilder(128)
-				.append("Book-collector: reject premature collection: [")
-				.append(loan.getId()).append("]: ")
-				.append(loan.getTerm().getTime()
+			if (System.currentTimeMillis() < loan.getTerm().getTime()) {
+				logger.warn(new StringBuilder(128)
+					.append("Book-collector: reject premature collection: [")
+					.append(loan.getId()).append("]: ")
+					.append(loan.getTerm().getTime()
 						- System.currentTimeMillis()));
-			loan.setStatus(LOANS.DEFAULT);	/* Make it eligible again. */
+				loan.setStatus(LOANS.DEFAULT);	/* Make it eligible again. */
+
+				try {
+					synchronized (lock) {
+						loanService.saveLoan(loan);
+					}
+				} catch (Exception e) {
+					logger.error(e.getMessage(), e);
+				}
+
+				return;
+			}
+
+			logger.debug(new StringBuilder(128)
+				.append("Book-collector: commence collecting: [")
+				.append(loan.getId()).append("]: ")
+				.append(loan.getTerm()).append("\n")
+				.append(loan.getBook()));
+			Iterable<TicketBean> tickets	= null;
 
 			try {
 				synchronized (lock) {
-					loanService.saveLoan(loan);
+					tickets	= ticketService.getAllTickets();
 				}
 			} catch (Exception e) {
 				logger.error(e.getMessage(), e);
-			}
-
-			return;
-		}
-
-		logger.debug(new StringBuilder(128)
-			.append("Book-collector: commence collecting: [")
-			.append(loan.getId()).append("]: ").append(loan.getTerm())
-			.append("\n").append(loan.getBook()));
-		Iterable<TicketBean> tickets	= null;
-
-		try {
-			synchronized (lock) {
-				tickets	= ticketService.getAllTickets();
-			}
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			shelve(loan);
-			return;
-		}
-
-		for (TicketBean ticket : tickets) {
-			if (!alive) {
-				return;
-			} else if (!ticket.getBook().equals(loan.getBook())) {
-				continue;
-			}
-
-			/*
-			 * Note: We assume that this book is the only copy
-			 *	and that the user has met the ticket quota.
-			 */
-			try {
-				/* Lend the book to the oldest ticket-holder. */
-				publisher.publishEvent(new MaturedTicketEvent(
-						loan.getId(), ticket, lock,
-						ticket.getUser().getLocale()));
-			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
 				shelve(loan);
+				return;
 			}
 
-			return;
-		}
+			for (TicketBean ticket : tickets) {
+				if (!alive) {
+					return;
+				} else if (!ticket.getBook()
+						.equals(loan.getBook())) {
+					continue;
+				}
 
-		shelve(loan);
+				/*
+				 * Note: We assume that this book is the only copy
+				 *	and that the user has met the ticket quota.
+				 */
+				try {
+					/* Lend the book to the oldest ticket-holder. */
+					publisher.publishEvent(
+						new MaturedTicketEvent(
+							loan.getId(), ticket, lock,
+							ticket.getUser().getLocale()));
+				} catch (Exception e) {
+					logger.error(e.getMessage(), e);
+					shelve(loan);
+				}
+
+				return;
+			}
+
+			shelve(loan);
+		} finally {
+			if (alive)
+				workers.incrementAndGet();
+		}
 	}
 
 	/* Manages the loans. */
