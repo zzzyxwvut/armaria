@@ -85,6 +85,7 @@ public enum Constants
 	////	`login`		VARCHAR(255)	NOT NULL UNIQUE,
 	////	`password`	VARCHAR(255)	NOT NULL,
 	////	`email`		VARCHAR(255)	NOT NULL UNIQUE,
+	////	`locale`	VARCHAR(32)	NOT NULL,
 	////	`role`		ENUM('CLIENT', 'PATRON') NOT NULL,
 	////	`status`	ENUM('DEFAULT', 'MANAGED') NOT NULL,
 	////	`token`		TEXT		NULL,
