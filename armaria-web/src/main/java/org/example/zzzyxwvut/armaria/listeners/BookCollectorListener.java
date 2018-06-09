@@ -59,11 +59,22 @@ public final class BookCollectorListener
 	{
 		final int size	= 32;
 		workers		= new AtomicLong(size);
+
+		/*
+		 * (1) if the thread count is less than the core size (32),
+		 *	create a new thread for the immediate task
+		 * (2) if not, put the task in the resizable work queue
+		 *	[16, Integer.MAX_VALUE], and hand it off to the first
+		 *	core pool thread available
+		 * (3) if not, create a new (terminable upon execution) thread
+		 *	[1, Integer.MAX_VALUE] to run the task
+		 * (4) else, reject the task ((0x7fffffff << 1) + 32 + 1)
+		 */
 		scheduler	= Executors.newScheduledThreadPool(size);
 		latchPoll	= new CountDownLatch(1);
 	}
 
-	/* Put the book on the shelf. */
+	/* Puts the book on the shelf. */
 	private void shelve(LoanBean loan)
 	{
 		BookBean book	= loan.getBook();
@@ -81,7 +92,7 @@ public final class BookCollectorListener
 		}
 	}
 
-	/* Collect a borrowed book. */
+	/* Collects a borrowed book. */
 	private void collect(LoanBean loan)
 	{
 		workers.incrementAndGet();
@@ -155,7 +166,7 @@ public final class BookCollectorListener
 		shelve(loan);
 	}
 
-	/* Manage the loans. */
+	/* Manages the loans. */
 	private void poll(long pause)
 	{
 		try {
@@ -239,7 +250,7 @@ public final class BookCollectorListener
 	}
 
 	/*
-	 * Restore all managed loans to the default state when the server is up,
+	 * Restores all managed loans to the default state when the server is up,
 	 * so as to be able to register them again.
 	 */
 	private void reclaim()
