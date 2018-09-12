@@ -22,38 +22,20 @@ public final class MaturedTicketListener
 	@Autowired
 	private Writer writer;
 
-	private void convey(Long loanId, Long ticketId, LoanBean anotherLoan)
-	{
-		loanService.deleteLoan(loanId);
-		ticketService.deleteTicket(ticketId);
-		loanService.saveLoan(anotherLoan);
-	}
-
-	private void convey(Long loanId, Long ticketId, LoanBean anotherLoan,
-								Object lock)
-	{
-		synchronized (lock) {
-			convey(loanId, ticketId, anotherLoan);
-		}
-	}
-
 	@EventListener
 	public void handleMaturedTicketEvent(MaturedTicketEvent event)
 	{
 		Long loanId		= event.getLoanId();
 		TicketBean ticket	= event.getTicket();
-		Object lock		= event.getLock();
 		String title		= ticket.getBook().getTitle();
 
 		LoanBean anotherLoan	= new LoanBean();
 		anotherLoan.setBook(ticket.getBook());
 		anotherLoan.setUser(ticket.getUser());
 
-		if (lock != null) {
-			convey(loanId, ticket.getId(), anotherLoan, lock);
-		} else {
-			convey(loanId, ticket.getId(), anotherLoan);
-		}
+		loanService.deleteLoan(loanId);
+		ticketService.deleteTicket(ticket.getId());
+		loanService.saveLoan(anotherLoan);
 
 		writer.composeAndSend(event.getLocale(), ticket.getUser().getEmail(),
 				"msg.mature.subject", null,

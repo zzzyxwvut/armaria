@@ -82,7 +82,7 @@ public class EditController
 					continue;
 
 				publisher.publishEvent(new MaturedTicketEvent(
-						loan.getId(), ticket, null,
+						loan.getId(), ticket,
 						ticket.getUser().getLocale()));
 				found	= true;
 				break;

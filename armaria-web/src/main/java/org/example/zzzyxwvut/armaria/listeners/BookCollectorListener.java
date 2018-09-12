@@ -14,12 +14,11 @@ import org.example.zzzyxwvut.armaria.beans.LoanBean;
 import org.example.zzzyxwvut.armaria.beans.TicketBean;
 import org.example.zzzyxwvut.armaria.domain.naming.Constants.BOOKS;
 import org.example.zzzyxwvut.armaria.domain.naming.Constants.LOANS;
-import org.example.zzzyxwvut.armaria.events.MaturedTicketEvent;
+import org.example.zzzyxwvut.armaria.mail.Writer;
 import org.example.zzzyxwvut.armaria.service.BookService;
 import org.example.zzzyxwvut.armaria.service.LoanService;
 import org.example.zzzyxwvut.armaria.service.TicketService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
@@ -43,7 +42,7 @@ public final class BookCollectorListener
 	private TicketService ticketService;
 
 	@Autowired
-	private ApplicationEventPublisher publisher;
+	private Writer writer;
 
 	private final Logger logger	= LogManager.getLogger();
 	private final ScheduledExecutorService scheduler;
@@ -148,10 +147,21 @@ public final class BookCollectorListener
 			 */
 			try {
 				/* Lend the book to the oldest ticket-holder. */
-				publisher.publishEvent(
-					new MaturedTicketEvent(
-						loan.getId(), ticket, lock,
-						ticket.getUser().getLocale()));
+				LoanBean anotherLoan	= new LoanBean();
+				anotherLoan.setBook(ticket.getBook());
+				anotherLoan.setUser(ticket.getUser());
+
+				synchronized (lock) {
+					loanService.deleteLoan(loan.getId());
+					ticketService.deleteTicket(ticket.getId());
+					loanService.saveLoan(anotherLoan);
+				}
+
+				String title	= ticket.getBook().getTitle();
+				writer.composeAndSend(ticket.getUser().getLocale(),
+					ticket.getUser().getEmail(),
+					"msg.mature.subject", null,
+					"msg.mature.body", new Object[] { title });
 			} catch (Exception e) {
 				logger.error(e.getMessage(), e);
 				shelve(loan);
