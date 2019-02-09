@@ -103,6 +103,17 @@ public enum Encryptor
 	{
 		assert word != null;
 
+		/*
+		 * Given that array sizes over 0x5ffffffd make the Base 64
+		 * data encoding algorithm overflow, viz
+		 *	(4 * (((0x5ffffffd + 1) + 2) / 3)),
+		 * and that every bite is swallowed with a grain of salt,
+		 * throw to the winds the high 3/8th.
+		 */
+		if (word.length > 0x2ffffffe)	/* 0x5ffffffd >> 1 */
+			throw new IllegalArgumentException(
+						"Unsupported array size");
+
 		byte[] uniform	= new byte[word.length << 1];
 		random.nextBytes(uniform);
 
