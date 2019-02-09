@@ -1,10 +1,10 @@
 package org.example.zzzyxwvut.armaria.listeners;
 
-import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
@@ -48,7 +48,6 @@ public final class BookCollectorListener
 	private final ScheduledExecutorService scheduler;
 	private final CountDownLatch latchPoll;
 	private final Object lock	= new Object();
-	private final Random random	= new Random();
 	private volatile boolean dirty	= true;
 	private volatile boolean alive	= true;
 	private Thread collector, registrar;
@@ -216,8 +215,9 @@ public final class BookCollectorListener
 					}
 
 					/* Bestow a 2-hour (and 16 minutes more) grace. */
-					long grace	= ((random.nextLong() & 15L) << 16L)
-										+ 7200000L;
+					long grace	= ((ThreadLocalRandom
+						.current().nextLong() & 15L) << 16L)
+									+ 7200000L;
 					assert grace < 9000000L;	/* 150 minutes */
 
 					long delay	= loan.getTerm().getTime() + grace
@@ -246,8 +246,8 @@ public final class BookCollectorListener
 			}
 
 			try {
-				TimeUnit.HOURS.sleep(5L
-					+ (random.nextLong() & 3L));
+				TimeUnit.HOURS.sleep(5L + (ThreadLocalRandom
+						.current().nextLong() & 3L));
 
 				if (dirty)
 					reclaim();
@@ -306,7 +306,7 @@ public final class BookCollectorListener
 			return;
 
 		final long delay	= TimeUnit.MINUTES.toMillis(
-						5L + (random.nextLong() & 7L));
+			5L + (ThreadLocalRandom.current().nextLong() & 7L));
 		registrar	= new Thread() {
 			@Override
 			public void run()

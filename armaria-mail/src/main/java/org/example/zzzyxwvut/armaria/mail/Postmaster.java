@@ -2,8 +2,8 @@ package org.example.zzzyxwvut.armaria.mail;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Random;
 import java.util.concurrent.Future;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 import javax.mail.Address;
@@ -30,12 +30,12 @@ public class Postmaster
 	private UserService userService;
 
 	private final Logger logger	= LogManager.getLogger();
-	private final Random random	= new Random();
 
 	@Async("taskmaster")
 	public Future<Void> send(MimeMessage message, int attempts)
 	{
-		long delay	= (random.nextLong() & 3L) + 1L;
+		long delay	= (ThreadLocalRandom.current().nextLong() & 3L)
+									+ 1L;
 
 		do {
 			try {
@@ -44,7 +44,8 @@ public class Postmaster
 				break;
 			} catch (Exception e) {
 				logger.error(e.getMessage(), e);
-				delay	= (random.nextLong() & 15L) + 8L;
+				delay	= (ThreadLocalRandom.current().nextLong()
+								& 15L) + 8L;
 			}	/* Re-send the message in 8-23 seconds. */
 		} while (--attempts > 0);
 
