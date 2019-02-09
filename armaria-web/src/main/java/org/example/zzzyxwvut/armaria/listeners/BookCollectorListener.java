@@ -1,5 +1,7 @@
 package org.example.zzzyxwvut.armaria.listeners;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
@@ -311,20 +313,23 @@ public final class BookCollectorListener
 			@Override
 			public void run()
 			{
-				long start	= delay;
-				long stop	= System.currentTimeMillis() + start;
+				RuntimeMXBean mxbean	=
+					ManagementFactory.getRuntimeMXBean();
+				long pause	= delay;
+				long start	= mxbean.getUptime();	/* milliseconds */
 
 				do {
 					try {	/* Consider migration dependencies. */
-						TimeUnit.MILLISECONDS.sleep(start);
+						TimeUnit.MILLISECONDS.sleep(pause);
 					} catch (InterruptedException e) {
 						if (!alive)
 							return;
 					}
 
-					start	= stop - System.currentTimeMillis();
+					/* Fits over 292 million years of uptime. */
+					pause	-= mxbean.getUptime() - start;
 
-					if (start < 1L) {
+					if (pause < 32768L) {
 						reclaim();
 						return;
 					}
